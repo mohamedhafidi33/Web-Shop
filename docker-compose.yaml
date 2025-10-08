@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    image: web-shop:1.0
+    container_name: web-shop-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/webshop_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+  postgres:
+    image: postgres:latest
+    container_name: webshop_db
+    environment:
+      - POSTGRES_DB=webshop_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
