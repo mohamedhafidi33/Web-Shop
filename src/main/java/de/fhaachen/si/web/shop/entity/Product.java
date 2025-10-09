@@ -13,15 +13,31 @@ public class Product {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+
 	private String name;
-	
+
 	private String description;
-	
+
 	private double price;
-	
-    @OneToMany(mappedBy = "product")
-    private List<OrderItem> orderItems;
+
+	@OneToMany(mappedBy = "product")
+	private List<OrderItem> orderItems;
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public List<OrderItem> getOrderItems() {
+		return orderItems;
+	}
+
+	public void setOrderItems(List<OrderItem> orderItems) {
+		this.orderItems = orderItems;
+	}
+
+	public Long getId() {
+		return id;
+	}
 
 	public String getName() {
 		return name;
@@ -38,17 +54,13 @@ public class Product {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	public double getPrice() {
 		return price;
 	}
 
 	public void setPrice(double price) {
 		this.price = price;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public List<OrderItem> getOrders() {
@@ -58,5 +70,5 @@ public class Product {
 	public void setOrders(List<OrderItem> orderItems) {
 		this.orderItems = orderItems;
 	}
-	
+
 }

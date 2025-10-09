@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 import de.fhaachen.si.web.shop.dto.CustomerDTO;
 import de.fhaachen.si.web.shop.entity.Customer;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CustomerMapper {
 	Customer cutomerDTOTOCustomer(CustomerDTO customerDTO);
 

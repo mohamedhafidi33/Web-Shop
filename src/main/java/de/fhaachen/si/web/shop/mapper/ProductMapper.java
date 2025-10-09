@@ -5,9 +5,9 @@ import org.mapstruct.Mapper;
 import de.fhaachen.si.web.shop.dto.ProductDTO;
 import de.fhaachen.si.web.shop.entity.Product;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ProductMapper {
 	
-	Product productToProductDTO(ProductDTO productDTO);
-	ProductDTO productDTOToProduct(Product product);
+	ProductDTO productToProductDTO(Product product);
+	Product productDTOToProduct(ProductDTO productDTO);
 }
