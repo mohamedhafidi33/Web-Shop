@@ -11,9 +11,9 @@ import de.fhaachen.si.web.shop.repository.ProductRepository;
 
 @Service
 public class ProductService {
-	
-	@Autowired
-	protected ProductRepository productRepository;
+
+    @Autowired
+    protected ProductRepository productRepository;
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -33,6 +33,7 @@ public class ProductService {
                     product.setName(updatedProduct.getName());
                     product.setDescription(updatedProduct.getDescription());
                     product.setPrice(updatedProduct.getPrice());
+                    product.setImageUrl(updatedProduct.getImageUrl());
                     return productRepository.save(product);
                 })
                 .orElseThrow(() -> new RuntimeException("Product not found"));

@@ -2,12 +2,14 @@ package de.fhaachen.si.web.shop.dto;
 
 public class ProductDTO {
 	private Long id;
-	
+
 	private String name;
-	
+
 	private String description;
-	
+
 	private double price;
+
+	private String imageUrl;
 
 	public Long getId() {
 		return id;
@@ -39,5 +41,13 @@ public class ProductDTO {
 
 	public void setPrice(double price) {
 		this.price = price;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 }

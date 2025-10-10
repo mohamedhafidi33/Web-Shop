@@ -6,6 +6,11 @@ function HomePage({ products, cart, setCart }) {
   const highlight = featured[0] || products?.[0];
   const second = featured[1] || products?.[1];
 
+  const getImage = (p) =>
+    p && p.imageUrl && p.imageUrl.trim() !== ""
+      ? p.imageUrl
+      : "https://images.unsplash.com/photo-1622428051717-dcd8412959de?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1480";
+
   return (
     <div>
       {/* Lightweight styles for hover/overlay (scoped to this component) */}
@@ -78,7 +83,7 @@ function HomePage({ products, cart, setCart }) {
                     style={{ height: 320 }}
                   >
                     <img
-                      src={highlight.image}
+                      src={getImage(highlight)}
                       alt={highlight.name}
                       className="img-cover"
                     />
@@ -110,7 +115,7 @@ function HomePage({ products, cart, setCart }) {
                     style={{ height: 320 }}
                   >
                     <img
-                      src={second.image}
+                      src={getImage(second)}
                       alt={second.name}
                       className="img-cover"
                     />
@@ -152,7 +157,7 @@ function HomePage({ products, cart, setCart }) {
               >
                 <div className="card border-0 shadow-sm h-100 position-relative hover-raise">
                   <img
-                    src={product.image}
+                    src={getImage(product)}
                     alt={product.name}
                     className="card-img-top"
                     style={{ height: 240, objectFit: "cover" }}

@@ -5,6 +5,10 @@ function ProductPage({ products, cart, setCart }) {
   const { id } = useParams();
   const p = products.find((item) => item.id === Number(id));
   const [qty, setQty] = useState(1);
+  const getImage = (p) =>
+    p && p.imageUrl && p.imageUrl.trim() !== ""
+      ? p.imageUrl
+      : "https://images.unsplash.com/photo-1622428051717-dcd8412959de?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1480";
   const addToCart = (product, amount = 1) => {
     const exists = cart.find((item) => item.id === product.id);
     if (exists) {
@@ -23,7 +27,7 @@ function ProductPage({ products, cart, setCart }) {
       <div className="row g-4 align-items-start">
         <div className="col-12 col-lg-6">
           <img
-            src={p.image}
+            src={getImage(p)}
             alt={p.name}
             className="img-fluid rounded shadow-sm"
           />

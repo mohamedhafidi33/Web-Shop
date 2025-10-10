@@ -20,6 +20,8 @@ public class Product {
 
 	private double price;
 
+	private String imageUrl;
+
 	@OneToMany(mappedBy = "product")
 	private List<OrderItem> orderItems;
 
@@ -71,4 +73,11 @@ public class Product {
 		this.orderItems = orderItems;
 	}
 
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 }
