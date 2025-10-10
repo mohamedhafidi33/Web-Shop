@@ -2,6 +2,7 @@ package de.fhaachen.si.web.shop.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +24,8 @@ import de.fhaachen.si.web.shop.service.ProductService;
 @CrossOrigin(origins = "*")
 public class ProductController {
 
-    private final ProductService productService;
+	@Autowired
+	private final ProductService productService;
     
     private final ProductMapper productMapper;
 
