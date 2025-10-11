@@ -14,15 +14,17 @@ public class Customer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+
 	private String name;
-	
+
 	private String email;
-	
+
+	private String password;
+
 	private String address;
-	
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Order> orders;
+
+	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+	private List<Order> orders;
 
 	public Long getId() {
 		return id;
@@ -48,6 +50,14 @@ public class Customer {
 		this.email = email;
 	}
 
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	public String getAddress() {
 		return address;
 	}
@@ -62,5 +72,5 @@ public class Customer {
 
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;
-	}	
+	}
 }

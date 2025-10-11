@@ -1,18 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function PayementForm({ cart = [], setCart, total }) {
   const navigate = useNavigate();
-
-  // Compute total from cart if not provided
-  const computedTotal =
-    typeof total === "number"
-      ? total
-      : cart.reduce(
-          (sum, item) => sum + (item.price || 0) * (item.qty || 1),
-          0
-        );
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,6 +11,32 @@ function PayementForm({ cart = [], setCart, total }) {
     expiry: "",
     cvc: "",
   });
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
+  useEffect(() => {
+    const authToken = localStorage.getItem("authToken");
+    const storedCustomer = localStorage.getItem("customer");
+    if (authToken || storedCustomer) {
+      if (storedCustomer) {
+        const customer = JSON.parse(storedCustomer);
+        setFormData((prev) => ({
+          ...prev,
+          name: customer.name || "",
+          email: customer.email || "",
+          address: customer.address || "",
+        }));
+      }
+      setIsSignedIn(true);
+    }
+  }, []);
+
+  const computedTotal =
+    typeof total === "number"
+      ? total
+      : cart.reduce(
+          (sum, item) => sum + (item.price || 0) * (item.qty || 1),
+          0
+        );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,10 +67,20 @@ function PayementForm({ cart = [], setCart, total }) {
     navigate("/thank-you");
   };
 
+  if (!isSignedIn) {
+    return (
+      <div className="container py-5 text-center">
+        <h2>You must be signed in to complete your purchase.</h2>
+        <Link to="/signin" className="btn btn-dark mt-3">
+          Go to Sign In
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="container py-5">
       <h1 className="h3 mb-4">Checkout</h1>
-
       <div className="row g-4">
         {/* Order Summary */}
         <div className="col-12 col-lg-7">

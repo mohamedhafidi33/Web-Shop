@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
+  const isSignedIn =
+    localStorage.getItem("authToken") || localStorage.getItem("userEmail");
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
       <div className="container">
@@ -34,6 +36,35 @@ function Navbar() {
                 <i className="bi bi-bag me-1"></i> Shop
               </Link>
             </li>
+
+            {isSignedIn && (
+              <>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-white fw-semibold"
+                    to="/products/list"
+                  >
+                    <i className="bi bi-tools me-1"></i> Manage Products
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-white fw-semibold"
+                    to="/profile"
+                  >
+                    <i className="bi bi-person-circle me-1"></i> My Profile
+                  </Link>
+                </li>
+              </>
+            )}
+
+            {!isSignedIn && (
+              <li className="nav-item">
+                <Link className="nav-link text-white fw-semibold" to="/signin">
+                  <i className="bi bi-box-arrow-in-right me-1"></i> Sign In
+                </Link>
+              </li>
+            )}
 
             <li className="nav-item">
               <button

@@ -6,14 +6,16 @@ import de.fhaachen.si.web.shop.entity.Order;
 
 public class CustomerDTO {
 	private Long id;
-	
+
 	private String name;
-	
+
 	private String email;
-	
+
 	private String address;
-	
-    private List<Order> orders;
+
+	private List<Order> orders;
+
+	private String password;
 
 	public Long getId() {
 		return id;
@@ -53,5 +55,13 @@ public class CustomerDTO {
 
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;
+	}
+
+	public String getPassowrd() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }

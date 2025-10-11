@@ -34,6 +34,7 @@ public class CustomerService {
 			customer.setId(id);
 			customer.setOrders(updatedCustomer.getOrders());
 			customer.setEmail(updatedCustomer.getEmail());
+			customer.setPassword(updatedCustomer.getPassword());
 			return customerRepository.save(customer);
 		}).orElseThrow(() -> new RuntimeException("Customer not found"));
 	}

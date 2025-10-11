@@ -7,6 +7,11 @@ import CartSideBar from "./components/CartSideBar";
 import PayementForm from "./components/PayementForm";
 import ThankYouPage from "./components/ThankYouPage";
 import HomePage from "./components/HomePage";
+import SignInPage from "./components/SignInPage";
+import SignUpPage from "./components/SignUpPage";
+import ProductsListPage from "./components/ProductsListPage";
+import ProductUpdatePage from "./components/ProductUpdatePage";
+import CustomerProfile from "./components/CustomerProfile";
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -53,11 +58,16 @@ function App() {
             <ProductPage products={products} cart={cart} setCart={setCart} />
           }
         />
+        <Route path="/products/list" element={<ProductsListPage />} />
+        <Route path="/products/list/:id" element={<ProductUpdatePage />} />
+        <Route path="/profile" element={<CustomerProfile />} />
         <Route
           path="/checkout"
           element={<PayementForm cart={cart} setCart={setCart} />}
         />
         <Route path="/thank-you" element={<ThankYouPage />} />
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
       </Routes>
     </BrowserRouter>
   );
