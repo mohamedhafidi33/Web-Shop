@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,19 +20,14 @@ import de.fhaachen.si.web.shop.service.ProductService;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "*")
 public class ProductController {
 
 	@Autowired
-	private final ProductService productService;
+	protected ProductService productService;
     
-    private final ProductMapper productMapper;
-
-    public ProductController(ProductService productService, ProductMapper productMapper) {
-        this.productService = productService;
-        this.productMapper = productMapper;
-    }
-
+	@Autowired
+    protected ProductMapper productMapper;
+    
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         return ResponseEntity.ok(productService.getAllProducts().stream().map(product -> productMapper.productToProductDTO(product)).toList());
@@ -46,19 +40,19 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/admin")
     public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO product) {
         Product created = productService.createProduct(productMapper.productDTOToProduct(product));
         return ResponseEntity.ok(productMapper.productToProductDTO(created));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/admin/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO product) {
         Product updated = productService.updateProduct(id, productMapper.productDTOToProduct(product));
         return ResponseEntity.ok(productMapper.productToProductDTO(updated));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();

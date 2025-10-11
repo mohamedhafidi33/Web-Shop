@@ -1,7 +1,5 @@
 package de.fhaachen.si.web.shop;
 
-import java.math.BigDecimal;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
