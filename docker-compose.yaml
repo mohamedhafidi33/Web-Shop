@@ -1,8 +1,20 @@
 services:
-  app:
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: web-shop-react:1.0
+    container_name: web-shop-react
+    ports:
+      - "3000:80"
+    depends_on:
+      - spring
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+  spring:
     build: .
-    image: web-shop:1.0
-    container_name: web-shop-app
+    image: web-shop-spring:1.0
+    container_name: web-shop-spring
     ports:
       - "8080:8080"
     depends_on:
