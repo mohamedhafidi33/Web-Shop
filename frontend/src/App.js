@@ -13,7 +13,7 @@ function App() {
 
   const [products, setProducts] = useState([]);
   const API_BASE =
-    process.env.NODE_ENV === "development" ? "http://localhost:8080" : "";
+    process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   useEffect(() => {
     (async () => {
