@@ -4,9 +4,15 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import de.fhaachen.si.web.shop.entity.Customer;
 import de.fhaachen.si.web.shop.entity.Product;
+import de.fhaachen.si.web.shop.entity.Role;
+import de.fhaachen.si.web.shop.entity.User;
+import de.fhaachen.si.web.shop.repository.CustomerRepository;
 import de.fhaachen.si.web.shop.repository.ProductRepository;
+import de.fhaachen.si.web.shop.repository.UserRepository;
 
 @SpringBootApplication
 public class WebShopApplication {
@@ -16,7 +22,8 @@ public class WebShopApplication {
     }
 
     @Bean
-    CommandLineRunner initDatabase(ProductRepository productRepository) {
+	CommandLineRunner initDatabase(ProductRepository productRepository, CustomerRepository customerRepository,
+			PasswordEncoder passwordEncoder) {
         return args -> {
             if (productRepository.count() == 0) {
                 Product p1 = new Product();
@@ -48,6 +55,19 @@ public class WebShopApplication {
             } else {
                 System.out.println("Products already exist.");
             }
+            
+            String adminEmail = "admin@webshop.com";
+                Customer admin = new Customer();
+                User user = new User();
+                user.setEmail(adminEmail);
+                user.setPassword(passwordEncoder.encode("admin"));
+                user.setRole(Role.ADMIN);
+                admin.setUser(user);
+
+                customerRepository.save(admin);
+                System.out.println("Default admin account created:");
+                System.out.println("Email: " + adminEmail);
+                System.out.println("Password: admin");
         };
     }
 

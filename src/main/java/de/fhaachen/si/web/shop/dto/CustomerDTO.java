@@ -16,6 +16,8 @@ public class CustomerDTO {
 	private List<Order> orders;
 
 	private String password;
+	
+	private String role;
 
 	public Long getId() {
 		return id;
@@ -57,11 +59,20 @@ public class CustomerDTO {
 		this.orders = orders;
 	}
 
-	public String getPassowrd() {
+	public String getPassword() {
 		return password;
 	}
 
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+	
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,7 +20,10 @@ public class User {
 	private String password;
 	
 	@Enumerated
-	private Role role;	
+	private Role role;
+	
+	@OneToOne(mappedBy = "user")
+	private Customer customer;
 
 	public Role getRole() {
 		return role;
@@ -52,6 +56,13 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
 	
 }

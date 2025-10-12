@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.fhaachen.si.web.shop.entity.Role;
-import de.fhaachen.si.web.shop.entity.User;
+import de.fhaachen.si.web.shop.dto.CustomerDTO;
+import de.fhaachen.si.web.shop.entity.Customer;
+import de.fhaachen.si.web.shop.mapper.CustomerMapper;
 import de.fhaachen.si.web.shop.security.JwtUtil;
+import de.fhaachen.si.web.shop.service.CustomerService;
 import de.fhaachen.si.web.shop.service.UserService;
 
 @RestController
@@ -21,6 +23,12 @@ public class AuthController {
 
 	@Autowired
 	protected UserService userService;
+	
+	@Autowired
+	protected CustomerService customerService;
+	
+	@Autowired
+	protected CustomerMapper customerMapper;
 
 	@Autowired
 	protected PasswordEncoder passwordEncoder;
@@ -29,14 +37,18 @@ public class AuthController {
 	protected JwtUtil jwtUtil;
 
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody User user) {
-		if (userService.findByEmail(user.getEmail()).isPresent()) {
+	public ResponseEntity<?> register(@RequestBody CustomerDTO customerDTO) {
+		if (userService.findByEmail(customerDTO.getEmail()).isPresent()) {
 			return ResponseEntity.badRequest().body("Email already exists");
 		}
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		user.setRole(Role.valueOf("CUSTOMER"));
-		User createdUser = userService.createUser(user);
-		return ResponseEntity.ok(createdUser);
+		customerDTO.setPassword(passwordEncoder.encode(customerDTO.getPassword()));
+		customerDTO.setRole("CUSTOMER");
+		Customer createdCustomer = customerService.createCustomer(customerMapper.cutomerDTOTOCustomer(customerDTO));
+		return ResponseEntity.ok(Map.of(
+				"customer", createdCustomer,
+				"token", jwtUtil.generateToken(createdCustomer.getUser().getEmail(), createdCustomer.getUser().getRole().toString()),
+                "role", createdCustomer.getUser().getRole()
+				));
 	}
 
 	@PostMapping("/login")

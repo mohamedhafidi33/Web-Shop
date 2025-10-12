@@ -7,13 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.fhaachen.si.web.shop.entity.Customer;
+import de.fhaachen.si.web.shop.entity.User;
 import de.fhaachen.si.web.shop.repository.CustomerRepository;
 
 @Service
 public class CustomerService {
 
 	@Autowired
-	private CustomerRepository customerRepository;
+    protected UserService userService;
+
+	@Autowired
+	protected CustomerRepository customerRepository;
+
+    CustomerService(UserService userService) {
+        this.userService = userService;
+    }
 
 	public List<Customer> getAllCustomers() {
 		return customerRepository.findAll();
@@ -33,8 +41,7 @@ public class CustomerService {
 			customer.setAddress(updatedCustomer.getAddress());
 			customer.setId(id);
 			customer.setOrders(updatedCustomer.getOrders());
-			customer.setEmail(updatedCustomer.getEmail());
-			customer.setPassword(updatedCustomer.getPassword());
+			customer.setUser(updatedCustomer.getUser());
 			return customerRepository.save(customer);
 		}).orElseThrow(() -> new RuntimeException("Customer not found"));
 	}
@@ -44,6 +51,11 @@ public class CustomerService {
 			throw new RuntimeException("Customer not found");
 		}
 		customerRepository.deleteById(id);
+	}
+	
+	public Optional<Customer> findByEmail(String email) {
+		Optional<User> user = userService.findByEmail(email);
+		return customerRepository.findByUser(user.get());
 	}
 
 }
