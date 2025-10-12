@@ -8,7 +8,7 @@ export default function ProductsManagementPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
     if (!token) {
       navigate("/signin");
       return;

@@ -34,9 +34,9 @@ public class AuthController {
 			return ResponseEntity.badRequest().body("Email already exists");
 		}
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		user.setRole(Role.valueOf("ROLE_CUSTOMER"));
-		userService.createUser(user);
-		return ResponseEntity.ok("User registered successfully");
+		user.setRole(Role.valueOf("CUSTOMER"));
+		User createdUser = userService.createUser(user);
+		return ResponseEntity.ok(createdUser);
 	}
 
 	@PostMapping("/login")

@@ -44,7 +44,9 @@ export default function SignInPage() {
         const text = await res.text();
         throw new Error(text || `Request failed (${res.status})`);
       }
+      localStorage.clear();
       const data = await res.json();
+      localStorage.setItem("role", data.role);
       localStorage.setItem("token", data.token);
       navigate("/");
     } catch (err) {

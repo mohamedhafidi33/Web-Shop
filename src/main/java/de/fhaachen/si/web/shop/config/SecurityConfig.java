@@ -23,7 +23,7 @@ import de.fhaachen.si.web.shop.security.JwtAuthFilter;
 import de.fhaachen.si.web.shop.service.CustomUserDetailsService;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @EnableMethodSecurity
 public class SecurityConfig {
 

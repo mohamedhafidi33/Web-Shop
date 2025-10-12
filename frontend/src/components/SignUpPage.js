@@ -9,6 +9,7 @@ export default function SignUpPage() {
     name: "",
     email: "",
     password: "",
+    role: "CUSTOMER",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -39,21 +40,25 @@ export default function SignUpPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE}/customers`, {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name.trim(),
           email: form.email.trim(),
           password: form.password,
+          role: form.role,
         }),
       });
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || `Request failed (${res.status})`);
       }
-      const created = await res.json();
-      setSuccess(`Welcome, ${created.name}! Your account was created.`);
+      localStorage.clear();
+      const data = await res.json();
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("token", data.token);
+      setSuccess(`Welcome, ${data.name}! Your account was created.`);
       setTimeout(() => navigate("/"), 1200);
     } catch (err) {
       setError(err.message || "Something went wrong.");

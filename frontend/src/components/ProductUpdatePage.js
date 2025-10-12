@@ -33,7 +33,7 @@ export default function ProductUpdatePage() {
   async function saveProduct(e) {
     e.preventDefault();
     try {
-      const res = await fetch(`/products/${id}`, {
+      const res = await fetch(`/products/admin/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(product),
