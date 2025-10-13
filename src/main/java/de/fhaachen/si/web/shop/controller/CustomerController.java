@@ -26,7 +26,7 @@ import de.fhaachen.si.web.shop.mapper.CustomerMapper;
 import de.fhaachen.si.web.shop.service.CustomerService;
 
 @RestController
-@RequestMapping("/customers/admin")
+@RequestMapping("/customers")
 public class CustomerController {
 
     @Autowired
@@ -38,20 +38,20 @@ public class CustomerController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping
+    @GetMapping("/admin")
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers().stream()
                 .map(Customer -> customerMapper.customerToCustomerDTO(Customer)).toList());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/admin/{id}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/admin")
     public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO customerDTO) {
         Customer created = customerService.createCustomer(customerMapper.cutomerDTOTOCustomer(customerDTO));
         return ResponseEntity.ok(customerMapper.customerToCustomerDTO(created));
@@ -63,7 +63,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerMapper.customerToCustomerDTO(updated));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/admin/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();

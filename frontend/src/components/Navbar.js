@@ -7,6 +7,7 @@ function Navbar() {
   const [isSignedIn, setIsSignedIn] = useState(
     !!localStorage.getItem("authToken")
   );
+  const [role, setRole] = useState(localStorage.getItem("role"))
 
   // Keep auth state in sync with localStorage changes
   useEffect(() => {
@@ -65,24 +66,25 @@ function Navbar() {
             </li>
 
             {isSignedIn && (
-              <>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link text-white fw-semibold"
-                    to="/products/list"
-                  >
-                    <i className="bi bi-tools me-1"></i> Manage Products
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link text-white fw-semibold"
-                    to="/profile"
-                  >
-                    <i className="bi bi-person-circle me-1"></i> My Profile
-                  </Link>
-                </li>
-              </>
+              <li className="nav-item">
+                <Link
+                  className="nav-link text-white fw-semibold"
+                  to="/profile"
+                >
+                  <i className="bi bi-person-circle me-1"></i> My Profile
+                </Link>
+              </li>
+            )}
+
+            {isSignedIn && role === "ADMIN" && (
+              <li className="nav-item">
+                <Link
+                  className="nav-link text-white fw-semibold"
+                  to="/products/list"
+                >
+                  <i className="bi bi-tools me-1"></i> Manage Products
+                </Link>
+              </li>
             )}
 
             {!isSignedIn && (

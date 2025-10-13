@@ -6,6 +6,7 @@ const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080";
 export default function CustomerProfile() {
   const navigate = useNavigate();
   const [customer, setCustomer] = useState({
+    id: "",
     name: "",
     email: "",
     address: "",
@@ -26,7 +27,7 @@ export default function CustomerProfile() {
   async function loadCustomer(token) {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/customers/admin/me`, {
+      const res = await fetch(`${API_BASE}/customers/me`, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -67,7 +68,7 @@ export default function CustomerProfile() {
       return;
     }
     try {
-      const res = await fetch(`${API_BASE}/customers/admin/me`, {
+      const res = await fetch(`${API_BASE}/customers/${customer.id}`, {
         method: "PUT",
         credentials: "include",
         headers: {
