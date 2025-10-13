@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function ProductsManagementPage() {
+export default function ProductsListPage() {
+  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken");
     if (!token) {
       navigate("/signin");
       return;
@@ -20,8 +21,30 @@ export default function ProductsManagementPage() {
     try {
       setLoading(true);
       setError("");
-      const res = await fetch("/products");
-      if (!res.ok) throw new Error("Failed to load products");
+      const token = localStorage.getItem("authToken");
+      const res = await fetch(`${API_BASE}/products`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          Accept: "application/json",
+        },
+      });
+      if (res.status === 401 || res.status === 403) {
+        navigate("/signin");
+        return;
+      }
+      const ct = res.headers.get("content-type") || "";
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(
+          `Failed to load products (${res.status}). ${text.slice(0, 120)}`
+        );
+      }
+      if (!ct.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(
+          `Unexpected response (not JSON). ${text.slice(0, 120)}`
+        );
+      }
       const data = await res.json();
       setItems(data);
     } catch (e) {
@@ -33,9 +56,23 @@ export default function ProductsManagementPage() {
 
   async function remove(id) {
     if (!window.confirm("Delete this product?")) return;
-    const res = await fetch(`/products/${id}`, { method: "DELETE" });
-    if (res.ok) setItems((prev) => prev.filter((p) => p.id !== id));
-    else alert("Delete failed");
+    const token = localStorage.getItem("authToken");
+    const res = await fetch(`${API_BASE}/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+        Accept: "application/json",
+      },
+    });
+    if (res.status === 401 || res.status === 403) {
+      navigate("/signin");
+      return;
+    }
+    if (res.ok) {
+      setItems((prev) => prev.filter((p) => p.id !== id));
+    } else {
+      alert("Delete failed");
+    }
   }
 
   if (loading) return <div style={{ padding: "2rem" }}>Loading…</div>;

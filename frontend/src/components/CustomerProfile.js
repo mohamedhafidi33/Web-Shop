@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
+const API_BASE =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api";
+
 export default function CustomerProfile() {
   const navigate = useNavigate();
   const [customer, setCustomer] = useState({
@@ -17,18 +20,41 @@ export default function CustomerProfile() {
       navigate("/signin");
       return;
     }
-    loadCustomer();
+    loadCustomer(token);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
-  async function loadCustomer() {
+  async function loadCustomer(token) {
     try {
       setLoading(true);
-      const res = await fetch("/customers/me");
-      if (!res.ok) throw new Error("Failed to load profile");
+      const res = await fetch(`${API_BASE}/customers/admin/me`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.status === 401) {
+        navigate("/signin");
+        return;
+      }
+      const isJson = res.headers
+        .get("content-type")
+        ?.includes("application/json");
+      if (!res.ok) {
+        throw new Error(`Request failed (${res.status})`);
+      }
+      if (!isJson) {
+        const text = await res.text();
+        throw new Error(
+          `Non-JSON response (${res.status}): ${text.slice(0, 80)}`
+        );
+      }
       const data = await res.json();
       setCustomer(data);
+      setError("");
     } catch (e) {
-      setError(e.message);
+      setError(e.message || "Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -36,16 +62,37 @@ export default function CustomerProfile() {
 
   async function saveProfile(e) {
     e.preventDefault();
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
     try {
-      const res = await fetch("/customers/me", {
+      const res = await fetch(`${API_BASE}/customers/admin/me`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(customer),
       });
-      if (!res.ok) throw new Error("Failed to update profile");
-      alert("Profile updated successfully!");
+      if (res.status === 401) {
+        navigate("/signin");
+        return;
+      }
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      const isJson = res.headers
+        .get("content-type")
+        ?.includes("application/json");
+      if (!isJson) {
+        const text = await res.text();
+        throw new Error(
+          `Non-JSON response (${res.status}): ${text.slice(0, 80)}`
+        );
+      }
     } catch (e) {
-      alert(e.message);
+      setError(e.message || "Failed to update profile");
     }
   }
 

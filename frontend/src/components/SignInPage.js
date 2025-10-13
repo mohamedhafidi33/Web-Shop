@@ -47,7 +47,9 @@ export default function SignInPage() {
       localStorage.clear();
       const data = await res.json();
       localStorage.setItem("role", data.role);
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("authToken", data.token);
+      if (data.customerId)
+        localStorage.setItem("customerId", String(data.customerId));
       navigate("/");
     } catch (err) {
       setError(err.message || "Invalid credentials.");

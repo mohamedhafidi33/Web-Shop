@@ -1,9 +1,36 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 function Navbar() {
-  const [isSignedIn, setIsSignedIn] = useState(!!localStorage.getItem("token"));
-  const [role, setRole] = useState(localStorage.getItem("role"));
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isSignedIn, setIsSignedIn] = useState(
+    !!localStorage.getItem("authToken")
+  );
+
+  // Keep auth state in sync with localStorage changes
+  useEffect(() => {
+    const updateAuthFromStorage = () => {
+      setIsSignedIn(!!localStorage.getItem("authToken"));
+    };
+    updateAuthFromStorage();
+    window.addEventListener("storage", updateAuthFromStorage);
+    return () => window.removeEventListener("storage", updateAuthFromStorage);
+  }, []);
+
+  useEffect(() => {
+    // Re-evaluate auth state on every route change so Navbar updates without a manual refresh
+    setIsSignedIn(!!localStorage.getItem("authToken"));
+  }, [location.pathname]);
+
+  const handleSignOut = () => {
+    // Clear minimal auth-related keys; keep it simple as requested
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("role");
+    setIsSignedIn(false);
+    navigate("/signin");
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3">
       <div className="container">
@@ -37,7 +64,7 @@ function Navbar() {
               </Link>
             </li>
 
-            {isSignedIn &&(
+            {isSignedIn && (
               <>
                 <li className="nav-item">
                   <Link
@@ -57,32 +84,24 @@ function Navbar() {
                 </li>
               </>
             )}
-            {isSignedIn && role === "ADMIN" &&(
-              <>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link text-white fw-semibold"
-                    to="/products/list"
-                  >
-                    <i className="bi bi-tools me-1"></i> Customers
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link text-white fw-semibold"
-                    to="/profile"
-                  >
-                    <i className="bi bi-person-circle me-1"></i> My Profile
-                  </Link>
-                </li>
-              </>
-            )}
 
             {!isSignedIn && (
               <li className="nav-item">
                 <Link className="nav-link text-white fw-semibold" to="/signin">
                   <i className="bi bi-box-arrow-in-right me-1"></i> Sign In
                 </Link>
+              </li>
+            )}
+
+            {isSignedIn && (
+              <li className="nav-item">
+                <button
+                  type="button"
+                  className="btn btn-outline-light fw-semibold px-3 ms-lg-2"
+                  onClick={handleSignOut}
+                >
+                  <i className="bi bi-box-arrow-right me-1"></i> Sign Out
+                </button>
               </li>
             )}
 

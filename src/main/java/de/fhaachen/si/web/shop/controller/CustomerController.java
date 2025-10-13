@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+
+import de.fhaachen.si.web.shop.repository.UserRepository;
+import de.fhaachen.si.web.shop.entity.User;
 
 import de.fhaachen.si.web.shop.dto.CustomerDTO;
 import de.fhaachen.si.web.shop.entity.Customer;
@@ -22,14 +27,19 @@ import de.fhaachen.si.web.shop.service.CustomerService;
 @RequestMapping("/customers/admin")
 public class CustomerController {
 
-	@Autowired
+    @Autowired
     protected CustomerService customerService;
-	
-	protected CustomerMapper customerMapper;
+
+    @Autowired
+    protected CustomerMapper customerMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers().stream().map(Customer -> customerMapper.customerToCustomerDTO(Customer)).toList());
+        return ResponseEntity.ok(customerService.getAllCustomers().stream()
+                .map(Customer -> customerMapper.customerToCustomerDTO(Customer)).toList());
     }
 
     @GetMapping("/{id}")
@@ -55,5 +65,18 @@ public class CustomerController {
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<CustomerDTO> getCurrentCustomer(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null || user.getCustomer() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(customerMapper.customerToCustomerDTO(user.getCustomer()));
     }
 }
