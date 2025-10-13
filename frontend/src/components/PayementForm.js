@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function PayementForm({ cart = [], setCart, total }) {
+function PaymentForm({ cart = [], setCart, total }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -11,21 +11,22 @@ function PayementForm({ cart = [], setCart, total }) {
     expiry: "",
     cvc: "",
   });
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [customer, setCustomer] = useState(localStorage.getItem("customer"));
+  const [isSignedIn, setIsSignedIn] = useState(!!localStorage.getItem("authToken"));
 
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     const storedCustomer = localStorage.getItem("customer");
-    if (authToken || storedCustomer) {
-      if (storedCustomer) {
-        const customer = JSON.parse(storedCustomer);
-        setFormData((prev) => ({
-          ...prev,
-          name: customer.name || "",
-          email: customer.email || "",
-          address: customer.address || "",
-        }));
-      }
+
+    if (authToken && storedCustomer) {
+      const parsedCustomer = JSON.parse(storedCustomer);
+      setCustomer(parsedCustomer);
+      setFormData((prev) => ({
+        ...prev,
+        name: parsedCustomer.name || "",
+        email: parsedCustomer.email || "",
+        address: parsedCustomer.address || "",
+      }));
       setIsSignedIn(true);
     }
   }, []);
@@ -45,26 +46,42 @@ function PayementForm({ cart = [], setCart, total }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await fetch("http://localhost:8080/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customer: formData,
-          items: cart.map(({ id, name, price, qty = 1 }) => ({
-            id,
-            name,
-            price,
-            qty,
-          })),
-          total: computedTotal,
-        }),
-      });
-    } catch (err) {
-      // ignore for demo if backend not ready
+    if (!customer?.id) {
+      alert("You must be signed in to place an order.");
+      return;
     }
-    if (setCart) setCart([]);
-    navigate("/thank-you");
+
+    try {
+      const authToken = localStorage.getItem("authToken");
+
+      const orderPayload = {
+        customerId: customer.id,
+        items: cart.map((item) => ({
+          productId: item.id,
+          quantity: item.qty || 1,
+        })),
+      };
+
+      const response = await fetch("http://localhost:8080/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
+        body: JSON.stringify(orderPayload),
+      });
+
+      if (!response.ok) throw new Error("Failed to submit order");
+
+      const order = await response.json();
+      console.log("Order created:", order);
+
+      setCart && setCart([]);
+      navigate("/thank-you", { state: { order } });
+    } catch (err) {
+      console.error("Error creating order:", err);
+      alert("An error occurred while placing your order.");
+    }
   };
 
   if (!isSignedIn) {
@@ -87,7 +104,7 @@ function PayementForm({ cart = [], setCart, total }) {
           <div className="card shadow-sm h-100">
             <div className="card-body">
               <h5 className="card-title mb-3">Order Summary</h5>
-              {!cart || cart.length === 0 ? (
+              {cart.length === 0 ? (
                 <div className="text-muted">
                   Your cart is empty. <Link to="/">Go back to shop</Link>
                 </div>
@@ -98,7 +115,7 @@ function PayementForm({ cart = [], setCart, total }) {
                       key={item.id}
                       className="d-flex justify-content-between align-items-center border-bottom py-2"
                     >
-                      <div className="me-2">
+                      <div>
                         <div className="fw-semibold">{item.name}</div>
                         <div className="text-muted small">
                           {item.qty || 1} × {item.price} €
@@ -124,11 +141,7 @@ function PayementForm({ cart = [], setCart, total }) {
           <div className="card shadow-sm h-100">
             <div className="card-body">
               <h5 className="card-title mb-3">Payment</h5>
-              <form
-                className="needs-validation"
-                noValidate
-                onSubmit={handleSubmit}
-              >
+              <form onSubmit={handleSubmit}>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label">Full name</label>
@@ -136,7 +149,6 @@ function PayementForm({ cart = [], setCart, total }) {
                       type="text"
                       className="form-control"
                       name="name"
-                      placeholder="Enter your full name"
                       value={formData.name}
                       onChange={handleChange}
                       required
@@ -148,7 +160,6 @@ function PayementForm({ cart = [], setCart, total }) {
                       type="email"
                       className="form-control"
                       name="email"
-                      placeholder="Enter your email address"
                       value={formData.email}
                       onChange={handleChange}
                       required
@@ -160,7 +171,6 @@ function PayementForm({ cart = [], setCart, total }) {
                       type="text"
                       className="form-control"
                       name="address"
-                      placeholder="Enter your full address"
                       value={formData.address}
                       onChange={handleChange}
                       required
@@ -221,4 +231,4 @@ function PayementForm({ cart = [], setCart, total }) {
   );
 }
 
-export default PayementForm;
+export default PaymentForm;

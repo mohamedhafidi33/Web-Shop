@@ -67,10 +67,10 @@ export default function CustomerProfile() {
       navigate("/signin");
       return;
     }
+    console.log(customer);
     try {
       const res = await fetch(`${API_BASE}/customers/${customer.id}`, {
         method: "PUT",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -81,16 +81,12 @@ export default function CustomerProfile() {
         navigate("/signin");
         return;
       }
-      if (!res.ok) throw new Error(`Request failed (${res.status})`);
-      const isJson = res.headers
-        .get("content-type")
-        ?.includes("application/json");
-      if (!isJson) {
-        const text = await res.text();
-        throw new Error(
-          `Non-JSON response (${res.status}): ${text.slice(0, 80)}`
-        );
-      }
+      const data = await res.json();
+      setCustomer(data);
+      setError("");
+
+      alert("Profile updated successfully!");
+      navigate("/");
     } catch (e) {
       setError(e.message || "Failed to update profile");
     }

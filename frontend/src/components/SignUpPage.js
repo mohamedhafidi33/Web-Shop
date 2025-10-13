@@ -57,7 +57,7 @@ export default function SignUpPage() {
       localStorage.clear();
       const data = await res.json();
       localStorage.setItem("role", data.role);
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("authToken", data.token);
       setSuccess(`Welcome, ${data.name}! Your account was created.`);
       setTimeout(() => navigate("/"), 1200);
     } catch (err) {
@@ -98,6 +98,19 @@ export default function SignUpPage() {
                     className="form-control"
                     placeholder="Jane Doe"
                     value={form.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="addresse" className="form-label">
+                    Address
+                  </label>
+                  <textarea
+                    id="address"
+                    name="address"
+                    value={form.address}
                     onChange={handleChange}
                     required
                   />
