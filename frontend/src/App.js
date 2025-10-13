@@ -12,13 +12,13 @@ import SignUpPage from "./components/SignUpPage";
 import ProductsListPage from "./components/ProductsListPage";
 import ProductUpdatePage from "./components/ProductUpdatePage";
 import CustomerProfile from "./components/CustomerProfile";
+import CreateProduct from "./components/CreateProduct";
 
 function App() {
   const [cart, setCart] = useState([]);
 
   const [products, setProducts] = useState([]);
-  const API_BASE =
-    process.env.REACT_APP_API_URL || "http://localhost:8080";
+  const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
   useEffect(() => {
     (async () => {
@@ -59,7 +59,8 @@ function App() {
           }
         />
         <Route path="/products/list" element={<ProductsListPage />} />
-        <Route path="/products/list/:id" element={<ProductUpdatePage />} />
+        <Route path="/products/:id" element={<ProductUpdatePage />} />
+        <Route path="/products/new" element={<CreateProduct />} />
         <Route path="/profile" element={<CustomerProfile />} />
         <Route
           path="/checkout"

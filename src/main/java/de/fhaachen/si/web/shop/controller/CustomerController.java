@@ -1,6 +1,8 @@
 package de.fhaachen.si.web.shop.controller;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +70,7 @@ public class CustomerController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<CustomerDTO> getCurrentCustomer(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> getCurrentCustomer(Authentication authentication) {
         if (authentication == null || authentication.getName() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -77,6 +79,14 @@ public class CustomerController {
         if (user == null || user.getCustomer() == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(customerMapper.customerToCustomerDTO(user.getCustomer()));
+
+        Customer customer = user.getCustomer();
+        Map<String, Object> body = new HashMap<>();
+        body.put("id", customer.getId());
+        body.put("name", customer.getName());
+        body.put("address", customer.getAddress());
+        body.put("email", user.getEmail());
+
+        return ResponseEntity.ok(body);
     }
 }
