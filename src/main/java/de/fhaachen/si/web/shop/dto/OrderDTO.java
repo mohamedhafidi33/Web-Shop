@@ -1,17 +1,16 @@
 package de.fhaachen.si.web.shop.dto;
 
 import java.util.List;
-
-import de.fhaachen.si.web.shop.entity.Customer;
-import de.fhaachen.si.web.shop.entity.OrderItem;
+import java.time.LocalDateTime;
 
 public class OrderDTO {
 
 	private Long id;
-
-	private Customer customer;
-
-	private List<OrderItem> orderItems;
+	private Long customerId;
+	private LocalDateTime createdAt;
+	private String status;
+	private Double totalAmount;
+	private List<OrderItemDTO> items;
 
 	public Long getId() {
 		return id;
@@ -21,19 +20,43 @@ public class OrderDTO {
 		this.id = id;
 	}
 
-	public Customer getCustomer() {
-		return customer;
+	public Long getCustomerId() {
+		return customerId;
 	}
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
+	public void setCustomerId(Long customerId) {
+		this.customerId = customerId;
 	}
 
-	public List<OrderItem> getOrderItems() {
-		return orderItems;
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setOrderItems(List<OrderItem> orderItems) {
-		this.orderItems = orderItems;
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public Double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public List<OrderItemDTO> getItems() {
+		return items;
+	}
+
+	public void setItems(List<OrderItemDTO> items) {
+		this.items = items;
+	}
+
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
 	}
 }

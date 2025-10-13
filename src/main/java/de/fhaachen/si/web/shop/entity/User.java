@@ -1,6 +1,7 @@
 package de.fhaachen.si.web.shop.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +20,7 @@ public class User {
 	
 	private String password;
 	
-	@Enumerated
+	@Enumerated(EnumType.STRING)
 	private Role role;
 	
 	@OneToOne(mappedBy = "user")
