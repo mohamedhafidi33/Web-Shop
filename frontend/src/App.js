@@ -13,6 +13,7 @@ import ProductsListPage from "./components/ProductsListPage";
 import ProductUpdatePage from "./components/ProductUpdatePage";
 import CustomerProfile from "./components/CustomerProfile";
 import CreateProduct from "./components/CreateProduct";
+import PurchaseHistoryPage from "./components/PurchaseHistoryPage";
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -62,6 +63,7 @@ function App() {
         <Route path="/products/:id" element={<ProductUpdatePage />} />
         <Route path="/products/new" element={<CreateProduct />} />
         <Route path="/profile" element={<CustomerProfile />} />
+        <Route path="/orders" element={<PurchaseHistoryPage/>} />
         <Route
           path="/checkout"
           element={<PayementForm cart={cart} setCart={setCart} />}

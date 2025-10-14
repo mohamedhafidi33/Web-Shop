@@ -46,10 +46,12 @@ export default function SignInPage() {
       }
       localStorage.clear();
       const data = await res.json();
+      console.log(data);
       localStorage.setItem("role", data.role);
       localStorage.setItem("authToken", data.token);
-      if (data.customerId)
-        localStorage.setItem("customerId", String(data.customerId));
+      localStorage.setItem("customer", JSON.stringify(data.customer));
+/*       if (data.customerId)
+        localStorage.setItem("customerId", String(data.customer.id));
       if (data.token) {
       const profileRes = await fetch(`${API_BASE}/customers/me`, {
         headers: { Authorization: `Bearer ${data.token}` },
@@ -58,7 +60,7 @@ export default function SignInPage() {
         const profile = await profileRes.json();
         localStorage.setItem("customer", JSON.stringify(profile));
       }
-    }
+    } */
       navigate("/");
     } catch (err) {
       setError(err.message || "Invalid credentials.");

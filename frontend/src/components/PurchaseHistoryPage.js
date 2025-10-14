@@ -7,8 +7,14 @@ export default function PurchaseHistoryPage() {
 
   useEffect(() => {
     if (!customer || !customer.id) return;
-
-    fetch(`http://localhost:8080/customers/${customer.id}/orders`)
+    const token = localStorage.getItem("authToken");
+    fetch(`http://localhost:8080/orders/customer/${customer.id}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => setOrders(data));
   }, []);
@@ -30,7 +36,7 @@ export default function PurchaseHistoryPage() {
               <ul>
                 {(order.items || []).map((item) => (
                   <li key={item.id}>
-                    {item.product?.name} - €{item.product?.price} (x
+                    {item.productName} - €{item.price} (x
                     {item.quantity})
                   </li>
                 ))}

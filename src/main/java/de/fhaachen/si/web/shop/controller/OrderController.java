@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.fhaachen.si.web.shop.dto.OrderDTO;
 import de.fhaachen.si.web.shop.entity.Order;
-import de.fhaachen.si.web.shop.entity.OrderItem;
 import de.fhaachen.si.web.shop.entity.OrderStatus;
 import de.fhaachen.si.web.shop.mapper.OrderMapper;
 import de.fhaachen.si.web.shop.service.CustomerService;
@@ -33,8 +32,8 @@ public class OrderController {
 	@Autowired
 	protected OrderMapper orderMapper;
 	
-	@PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
+	@PostMapping("/customer/{customerId}")
+    public ResponseEntity<OrderDTO> createOrder(@PathVariable Long customerId, @RequestBody OrderDTO orderDTO) {
         Order order = orderService.createOrderFromDTO(orderDTO);
         return ResponseEntity.ok(orderMapper.orderToOrderDTO(order));
     }

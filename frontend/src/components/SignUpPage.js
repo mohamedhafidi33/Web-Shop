@@ -56,9 +56,12 @@ export default function SignUpPage() {
       }
       localStorage.clear();
       const data = await res.json();
+      console.log(data);
       localStorage.setItem("role", data.role);
       localStorage.setItem("authToken", data.token);
-      setSuccess(`Welcome, ${data.name}! Your account was created.`);
+      localStorage.setItem("customer", JSON.stringify(data.customer));
+/*       localStorage.setItem("customer", data.customer);
+ */      setSuccess(`Welcome, ${data.customer.name}! Your account was created.`);
       setTimeout(() => navigate("/"), 1200);
     } catch (err) {
       setError(err.message || "Something went wrong.");

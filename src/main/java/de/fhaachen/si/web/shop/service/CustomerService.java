@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.fhaachen.si.web.shop.dto.CustomerDTO;
 import de.fhaachen.si.web.shop.entity.Customer;
 import de.fhaachen.si.web.shop.entity.User;
 import de.fhaachen.si.web.shop.mapper.CustomerMapper;
@@ -23,10 +22,6 @@ public class CustomerService {
 	
 	@Autowired
 	protected CustomerMapper customerMapper;
-
-    CustomerService(UserService userService) {
-        this.userService = userService;
-    }
 
 	public List<Customer> getAllCustomers() {
 		return customerRepository.findAll();

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+const API_BASE = "http://localhost:8080";
+
 function PaymentForm({ cart = [], setCart, total }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -46,10 +48,10 @@ function PaymentForm({ cart = [], setCart, total }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!customer?.id) {
+/*     if (!customer?.id) {
       alert("You must be signed in to place an order.");
       return;
-    }
+    } */
 
     try {
       const authToken = localStorage.getItem("authToken");
@@ -62,7 +64,7 @@ function PaymentForm({ cart = [], setCart, total }) {
         })),
       };
 
-      const response = await fetch("http://localhost:8080/orders", {
+      const response = await fetch(`${API_BASE}/orders/customer/${customer.id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

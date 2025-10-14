@@ -57,7 +57,6 @@ public class OrderService {
     public Order createOrderFromDTO(OrderDTO orderDTO) {
         Order order = orderMapper.orderDTOToOrder(orderDTO);
 
-        // Fetch full Customer and Products for safety
         Customer customer = customerRepository.findById(orderDTO.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         order.setCustomer(customer);

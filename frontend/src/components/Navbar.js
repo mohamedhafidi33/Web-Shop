@@ -28,6 +28,7 @@ function Navbar() {
     // Clear minimal auth-related keys; keep it simple as requested
     localStorage.removeItem("authToken");
     localStorage.removeItem("role");
+    localStorage.removeItem("customer");
     setIsSignedIn(false);
     navigate("/signin");
   };
@@ -65,15 +66,25 @@ function Navbar() {
               </Link>
             </li>
 
-            {isSignedIn && (
-              <li className="nav-item">
-                <Link
-                  className="nav-link text-white fw-semibold"
-                  to="/profile"
-                >
-                  <i className="bi bi-person-circle me-1"></i> My Profile
-                </Link>
-              </li>
+            {isSignedIn && role === "CUSTOMER" && (
+              <>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-white fw-semibold"
+                    to="/orders"
+                  >
+                    <i className="bi bi-person-circle me-1"></i> My Orders
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-white fw-semibold"
+                    to="/profile"
+                  >
+                    <i className="bi bi-person-circle me-1"></i> My Profile
+                  </Link>
+                </li>
+              </>
             )}
 
             {isSignedIn && role === "ADMIN" && (
