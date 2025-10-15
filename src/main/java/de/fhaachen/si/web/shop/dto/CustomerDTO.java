@@ -2,8 +2,6 @@ package de.fhaachen.si.web.shop.dto;
 
 import java.util.List;
 
-import de.fhaachen.si.web.shop.entity.Order;
-
 public class CustomerDTO {
 	private Long id;
 
@@ -13,7 +11,7 @@ public class CustomerDTO {
 
 	private String address;
 
-	private List<Order> orders;
+	private List<OrderDTO> orders;
 
 	private String password;
 	
@@ -51,11 +49,11 @@ public class CustomerDTO {
 		this.address = address;
 	}
 
-	public List<Order> getOrders() {
+	public List<OrderDTO> getOrders() {
 		return orders;
 	}
 
-	public void setOrders(List<Order> orders) {
+	public void setOrders(List<OrderDTO> orders) {
 		this.orders = orders;
 	}
 

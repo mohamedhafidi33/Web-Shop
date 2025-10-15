@@ -8,6 +8,7 @@ export default function SignUpPage() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    address: "",
     password: "",
     role: "CUSTOMER",
   });
@@ -46,6 +47,7 @@ export default function SignUpPage() {
         body: JSON.stringify({
           name: form.name.trim(),
           email: form.email.trim(),
+          address: form.address,
           password: form.password,
           role: form.role,
         }),
@@ -107,13 +109,15 @@ export default function SignUpPage() {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="addresse" className="form-label">
+                  <label htmlFor="address" className="form-label">
                     Address
                   </label>
-                  <textarea
+                  <input
                     id="address"
                     name="address"
                     value={form.address}
+                    className="form-control"
+                    placeholder="Muterstrasse"
                     onChange={handleChange}
                     required
                   />

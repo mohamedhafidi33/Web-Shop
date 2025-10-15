@@ -33,6 +33,7 @@ export default function PurchaseHistoryPage() {
           {orders.map((order) => (
             <li key={order.id} className="list-group-item">
               <h5>Order #{order.id}</h5>
+              {order.status}
               <ul>
                 {(order.items || []).map((item) => (
                   <li key={item.id}>

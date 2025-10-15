@@ -7,7 +7,7 @@ import org.mapstruct.MappingTarget;
 import de.fhaachen.si.web.shop.dto.CustomerDTO;
 import de.fhaachen.si.web.shop.entity.Customer;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = OrderMapper.class)
 public interface CustomerMapper {
 	
 	@Mapping(source = "email", target = "user.email")
@@ -16,6 +16,7 @@ public interface CustomerMapper {
 	Customer cutomerDTOTOCustomer(CustomerDTO customerDTO);
 
 	@Mapping(source = "customer.user.email", target = "email")
+	@Mapping(source = "customer.user.password", target = "password")
 	@Mapping(source = "customer.user.role", target ="role")
 	CustomerDTO customerToCustomerDTO(Customer customer);
 	

@@ -48,7 +48,7 @@ public class AuthController {
 		customerDTO.setRole("CUSTOMER");
 		Customer createdCustomer = customerService.createCustomer(customerMapper.cutomerDTOTOCustomer(customerDTO));
 		return ResponseEntity.ok(Map.of(
-				"customer", createdCustomer,
+				"customer", customerMapper.customerToCustomerDTO(createdCustomer),
 				"token", jwtUtil.generateToken(createdCustomer.getUser().getEmail(), createdCustomer.getUser().getRole().toString()),
                 "role", createdCustomer.getUser().getRole()
 				));
