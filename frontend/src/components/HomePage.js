@@ -1,6 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+const HERO_IMG_URL =
+  "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=2000&auto=format&fit=crop";
+
 function HomePage({ products, cart, setCart }) {
   const featured = Array.isArray(products) ? products.slice(0, 4) : [];
   const highlight = featured[0] || products?.[0];
@@ -20,37 +23,41 @@ function HomePage({ products, cart, setCart }) {
         .img-cover { object-fit: cover; width: 100%; height: 100%; }
         .price-pill { position: absolute; bottom: .75rem; left: .75rem; }
         .bg-gradient-dark { background: linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.6)); }
+        .bg-hero-overlay { background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.85)); }
+        .hero { min-height: 82vh; }
+        @media (max-width: 768px) {
+          .hero { min-height: 65vh; }
+        }
       `}</style>
 
       {/* Hero Section */}
       <section
-        className="position-relative text-white"
+        className="position-relative text-white hero"
         style={{ minHeight: "70vh" }}
       >
         {/* Background image (static aesthetic) */}
         <div
           className="position-absolute top-0 start-0 w-100 h-100"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=2000&q=80'), url('https://images.unsplash.com/photo-1542060748-10c28b62716b?auto=format&fit=crop&w=2000&q=80'), url('https://via.placeholder.com/2000x900?text=Fashion+Collection')",
+            backgroundImage: `url('${HERO_IMG_URL}')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             filter: "contrast(1.1) saturate(1.1)",
           }}
         />
         {/* Overlay */}
-        <div className="position-absolute top-0 start-0 w-100 h-100 bg-gradient-dark" />
+        <div className="position-absolute top-0 start-0 w-100 h-100 bg-hero-overlay" />
 
         <div className="container position-relative" style={{ zIndex: 1 }}>
-          <div className="row align-items-center" style={{ minHeight: "70vh" }}>
+          <div className="row align-items-center" style={{ minHeight: "82vh" }}>
             <div className="col-12 col-lg-7 py-5">
-              <span className="badge bg-light text-dark mb-3">New Drop</span>
-              <h1 className="display-5 fw-bold mb-3">
-                Streetwear that actually hits.
+              <span className="badge bg-light text-dark mb-3">New in Tech</span>
+              <h1 className="display-4 fw-bold mb-3">
+                Gear that elevates your setup.
               </h1>
-              <p className="lead mb-4 text-white-50">
-                Oversized hoodies, baggy joggers, and clean caps — built for
-                daily wear.
+              <p className="fs-5 mb-4 text-white-50">
+                Precision mice, mechanical keyboards, and sleek accessories —
+                built for performance, durability, and style.
               </p>
               <Link to="/products" className="btn btn-light btn-lg me-2">
                 Shop now
