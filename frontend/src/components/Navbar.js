@@ -7,21 +7,40 @@ function Navbar() {
   const [isSignedIn, setIsSignedIn] = useState(
     !!localStorage.getItem("authToken")
   );
-  const [role, setRole] = useState(localStorage.getItem("role"))
+  const [role, setRole] = useState(localStorage.getItem("role"));
 
-  // Keep auth state in sync with localStorage changes
+  // Keep auth state in sync with localStorage (cross‑tab), custom events, and window focus
   useEffect(() => {
-    const updateAuthFromStorage = () => {
-      setIsSignedIn(!!localStorage.getItem("authToken"));
+    const refreshAuth = () => {
+      const token = localStorage.getItem("authToken");
+      const storedRole = localStorage.getItem("role");
+      setIsSignedIn(!!token);
+      setRole(storedRole);
     };
-    updateAuthFromStorage();
-    window.addEventListener("storage", updateAuthFromStorage);
-    return () => window.removeEventListener("storage", updateAuthFromStorage);
+    const onVisibility = () => {
+      if (!document.hidden) refreshAuth();
+    };
+
+    refreshAuth();
+    window.addEventListener("storage", refreshAuth);
+    window.addEventListener("auth-changed", refreshAuth);
+    window.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("focus", refreshAuth);
+
+    return () => {
+      window.removeEventListener("storage", refreshAuth);
+      window.removeEventListener("auth-changed", refreshAuth);
+      window.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", refreshAuth);
+    };
   }, []);
 
   useEffect(() => {
     // Re-evaluate auth state on every route change so Navbar updates without a manual refresh
-    setIsSignedIn(!!localStorage.getItem("authToken"));
+    const token = localStorage.getItem("authToken");
+    const storedRole = localStorage.getItem("role");
+    setIsSignedIn(!!token);
+    setRole(storedRole);
   }, [location.pathname]);
 
   const handleSignOut = () => {
@@ -29,6 +48,7 @@ function Navbar() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("role");
     localStorage.removeItem("customer");
+    window.dispatchEvent(new Event("auth-changed"));
     setIsSignedIn(false);
     navigate("/signin");
   };
