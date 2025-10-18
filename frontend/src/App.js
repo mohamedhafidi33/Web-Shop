@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProductImportSettings from "./components/ProductImportSettings";
+import { Navigate } from "react-router-dom";
 import ListProducts from "./components/ListProducts";
 import Navbar from "./components/Navbar";
 import ProductPage from "./components/ProductPage";
@@ -14,6 +16,15 @@ import ProductUpdatePage from "./components/ProductUpdatePage";
 import CustomerProfile from "./components/CustomerProfile";
 import CreateProduct from "./components/CreateProduct";
 import PurchaseHistoryPage from "./components/PurchaseHistoryPage";
+
+function RequireAdmin({ children }) {
+  const token = localStorage.getItem("authToken");
+  const role = localStorage.getItem("role");
+  if (!token || role !== "ADMIN") {
+    return <Navigate to="/signin" replace />;
+  }
+  return children;
+}
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -63,7 +74,7 @@ function App() {
         <Route path="/products/:id" element={<ProductUpdatePage />} />
         <Route path="/products/new" element={<CreateProduct />} />
         <Route path="/profile" element={<CustomerProfile />} />
-        <Route path="/orders" element={<PurchaseHistoryPage/>} />
+        <Route path="/orders" element={<PurchaseHistoryPage />} />
         <Route
           path="/checkout"
           element={<PayementForm cart={cart} setCart={setCart} />}
@@ -71,6 +82,14 @@ function App() {
         <Route path="/thank-you" element={<ThankYouPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route
+          path="/import"
+          element={
+            <RequireAdmin>
+              <ProductImportSettings />
+            </RequireAdmin>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
