@@ -286,7 +286,7 @@ export default function ProductImportSettings() {
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const resp = await fetch("/api/products/admin/import", {
+    const resp = await fetch("/api/import/admin/products", {
       method: "POST",
       headers,
       body: JSON.stringify(productsArray),
