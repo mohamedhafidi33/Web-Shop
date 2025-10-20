@@ -24,6 +24,8 @@ public class Product {
 
 	@OneToMany(mappedBy = "product")
 	private List<OrderItem> orderItems;
+	
+	private int stock;
 
 	public void setId(Long id) {
 		this.id = id;
@@ -80,4 +82,13 @@ public class Product {
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
+	
+	public int getStock() {
+		return stock;
+	}
+
+	public void setStock(int stock) {
+		this.stock = stock;
+	}
+
 }

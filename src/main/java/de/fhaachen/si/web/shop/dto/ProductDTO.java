@@ -10,6 +10,8 @@ public class ProductDTO {
 	private double price;
 
 	private String imageUrl;
+	
+	private int stock;
 
 	public Long getId() {
 		return id;
@@ -50,4 +52,13 @@ public class ProductDTO {
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
+
+	public int getStock() {
+		return stock;
+	}
+
+	public void setStock(int stock) {
+		this.stock = stock;
+	}
+	
 }
