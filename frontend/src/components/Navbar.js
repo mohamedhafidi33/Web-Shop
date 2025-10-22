@@ -108,14 +108,32 @@ function Navbar() {
             )}
 
             {isSignedIn && role === "ADMIN" && (
-              <li className="nav-item">
-                <Link
-                  className="nav-link text-white fw-semibold"
-                  to="/products/list"
-                >
-                  <i className="bi bi-tools me-1"></i> Manage Products
-                </Link>
-              </li>
+              <>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-white fw-semibold"
+                    to="/products/list"
+                  >
+                    <i className="bi bi-tools me-1"></i> Manage Products
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-white fw-semibold"
+                    to="/customers"
+                  >
+                    <i className="bi bi-tools me-1"></i> Customers List
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-white fw-semibold"
+                    to="/import"
+                  >
+                    <i className="bi bi-upload me-1"></i> Import Settings
+                  </Link>
+                </li>
+              </>
             )}
 
             {!isSignedIn && (
