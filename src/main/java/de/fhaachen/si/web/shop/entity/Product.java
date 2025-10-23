@@ -2,12 +2,16 @@ package de.fhaachen.si.web.shop.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 public class Product {
 	@Id
@@ -26,6 +30,9 @@ public class Product {
 	private List<OrderItem> orderItems;
 	
 	private int stock;
+	
+    @Column(unique = true)
+    private String productID;
 
 	public void setId(Long id) {
 		this.id = id;
@@ -90,5 +97,21 @@ public class Product {
 	public void setStock(int stock) {
 		this.stock = stock;
 	}
+
+	public String getProductID() {
+		return productID;
+	}
+
+	public void setProductID(String productID) {
+		this.productID = productID;
+	}
+
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", name=" + name + ", description=" + description + ", price=" + price
+				+ ", imageUrl=" + imageUrl + ", orderItems=" + orderItems + ", stock=" + stock + "]";
+	}
+	
+	
 
 }

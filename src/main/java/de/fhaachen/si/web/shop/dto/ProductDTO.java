@@ -12,6 +12,8 @@ public class ProductDTO {
 	private String imageUrl;
 	
 	private int stock;
+	
+    private String productID;
 
 	public Long getId() {
 		return id;
@@ -60,5 +62,12 @@ public class ProductDTO {
 	public void setStock(int stock) {
 		this.stock = stock;
 	}
-	
+
+	public String getProductID() {
+		return productID;
+	}
+
+	public void setProductID(String productID) {
+		this.productID = productID;
+	}
 }

@@ -1,9 +1,11 @@
 package de.fhaachen.si.web.shop;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import de.fhaachen.si.web.shop.entity.Customer;
@@ -12,10 +14,16 @@ import de.fhaachen.si.web.shop.entity.Role;
 import de.fhaachen.si.web.shop.entity.User;
 import de.fhaachen.si.web.shop.repository.CustomerRepository;
 import de.fhaachen.si.web.shop.repository.ProductRepository;
-import de.fhaachen.si.web.shop.repository.UserRepository;
 
 @SpringBootApplication
+@EnableScheduling
 public class WebShopApplication {
+	
+	@Value("${web.shop.admin.email}")
+	private String adminEmail;
+
+	@Value("${web.shop.admin.password}")
+	private String adminPassword;
 
     public static void main(String[] args) {
         SpringApplication.run(WebShopApplication.class, args);
@@ -56,18 +64,15 @@ public class WebShopApplication {
                 System.out.println("Products already exist.");
             }
             
-            String adminEmail = "admin@webshop.com";
-                Customer admin = new Customer();
-                User user = new User();
-                user.setEmail(adminEmail);
-                user.setPassword(passwordEncoder.encode("admin"));
-                user.setRole(Role.ADMIN);
-                admin.setUser(user);
+			Customer admin = new Customer();
+			User user = new User();
+			user.setEmail(adminEmail);
+			user.setPassword(passwordEncoder.encode(adminPassword));
+			user.setRole(Role.ADMIN);
+			admin.setUser(user);
 
-                customerRepository.save(admin);
-                System.out.println("Default admin account created:");
-                System.out.println("Email: " + adminEmail);
-                System.out.println("Password: admin");
+			customerRepository.save(admin);
+			System.out.println("Default admin account created:");
         };
     }
 
