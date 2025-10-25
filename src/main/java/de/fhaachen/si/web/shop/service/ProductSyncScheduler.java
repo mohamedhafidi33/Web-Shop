@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import de.fhaachen.si.web.shop.service.file.api.FileService;
@@ -12,13 +11,12 @@ import de.fhaachen.si.web.shop.service.file.api.FileService;
 @Service
 public class ProductSyncScheduler {
 
-	@Autowired
+    @Autowired
     protected FileService productFileService;
 
-    @Scheduled(cron = "${app.erp.remote.call.period}")
-    public void syncProducts() {
+    public void syncProducts(String endpoint, String username, String password) {
         try {
-            Path csvPath = productFileService.downloadFile();
+            Path csvPath = productFileService.downloadFile(endpoint, username, password);
             productFileService.importFromJson(csvPath);
             System.out.println("Product sync completed successfully at " + LocalDateTime.now());
         } catch (Exception e) {

@@ -34,29 +34,25 @@ public class ProductFileService implements FileService {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	@Value("${app.erp.remote.url}")
-	private String fileUrl;
-
-	@Value("${app.erp.remote.username}")
-	private String username;
-
-	@Value("${app.erp.remote.password}")
-	private String password;
-
 	@Value("${app.files.products.path}")
 	private String filePath;
 
 	@Override
-	public Path downloadFile() throws IOException {
+	public Path downloadFile(String endpoint, String username, String password) throws IOException {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm:ss").withLocale(Locale.GERMANY);
 		Path path = Paths.get(filePath + " - " + LocalDateTime.now().format(formatter));
 		Files.createDirectories(path.getParent());
 
-		WebClient webClient = WebClient.builder().defaultHeaders(headers -> headers.setBasicAuth(username, password))
+		WebClient webClient = WebClient.builder()
+				.defaultHeaders(headers -> headers.setBasicAuth(username, password))
 				.build();
 
-		byte[] fileBytes = webClient.get().uri(fileUrl).retrieve().bodyToMono(byte[].class)
-				.onErrorMap(e -> new RuntimeException("Failed to download product file: " + e.getMessage(), e)).block();
+		byte[] fileBytes = webClient.get()
+				.uri(endpoint)
+				.retrieve()
+				.bodyToMono(byte[].class)
+				.onErrorMap(e -> new RuntimeException("Failed to download product file: " + e.getMessage(), e))
+				.block();
 
 		if (fileBytes == null || fileBytes.length == 0) {
 			throw new RuntimeException("Downloaded file is empty");
