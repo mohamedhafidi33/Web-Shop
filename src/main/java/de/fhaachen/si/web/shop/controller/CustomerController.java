@@ -22,6 +22,7 @@ import de.fhaachen.si.web.shop.entity.User;
 
 import de.fhaachen.si.web.shop.dto.CustomerDTO;
 import de.fhaachen.si.web.shop.entity.Customer;
+import de.fhaachen.si.web.shop.entity.Role;
 import de.fhaachen.si.web.shop.mapper.CustomerMapper;
 import de.fhaachen.si.web.shop.service.CustomerService;
 
@@ -38,11 +39,12 @@ public class CustomerController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/admin")
-    public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers().stream()
-                .map(Customer -> customerMapper.customerToCustomerDTO(Customer)).toList());
-    }
+	@GetMapping("/admin")
+	public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
+		return ResponseEntity.ok(customerService.getAllCustomers().stream()
+				.map(Customer -> customerMapper.customerToCustomerDTO(Customer))
+				.filter(c -> !c.getRole().equals("ADMIN")).toList());
+	}
 
     @GetMapping("/admin/{id}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
