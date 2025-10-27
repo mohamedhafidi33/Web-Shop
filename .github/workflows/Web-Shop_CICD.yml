@@ -44,9 +44,9 @@ jobs:
           node-version: '22'
 
       - name: Install and Build React App
+        working-directory: ./frontend
         run: |
-          cd frontend
-          npm ci
+          npm install
           npm run build
       
       - name: Upload Frontend Build
