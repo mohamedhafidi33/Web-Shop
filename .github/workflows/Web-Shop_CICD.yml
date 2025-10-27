@@ -20,6 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ---- Backend Build ----
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -29,12 +30,30 @@ jobs:
 
       - name: Maven Build
         run: mvn clean install
-
+        
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-shop-artifact
           path: target/*.jar
+      
+      # ---- Frontend Build ----
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install and Build React App
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+      
+      - name: Upload Frontend Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/build
 
   # -----------------------
   #   Docker Build & Push
@@ -75,3 +94,12 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/web-shop:${{ env.TAG }}
             ${{ secrets.DOCKERHUB_USERNAME }}/web-shop:latest
+        
+      - name: Build & Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/web-shop-react:${{ env.TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/web-shop-react:latest
