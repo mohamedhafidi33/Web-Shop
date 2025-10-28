@@ -51,29 +51,29 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-	public void importProductsFromFile(MultipartFile file) throws IOException {
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-			String line;
-			reader.readLine();
-			while ((line = reader.readLine()) != null) {
-				String[] parts = line.split(",");
-				if (parts.length < 4) {
-					throw new IllegalArgumentException("Invalid format at line: " + line);
-				}
+    public void importProductsFromFile(MultipartFile file) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String line;
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length < 4) {
+                    throw new IllegalArgumentException("Invalid format at line: " + line);
+                }
 
-				Long productId = Long.parseLong(parts[0]);
-				String name = parts[1];
-				String description = parts[2];
-				Double price = Double.parseDouble(parts[3]);
+                Long productId = Long.parseLong(parts[0]);
+                String name = parts[1];
+                String description = parts[2];
+                Double price = Double.parseDouble(parts[3]);
 
-				Product product = productRepository.findById(productId).orElse(new Product());
-				product.setId(productId);
-				product.setName(name);
-				product.setDescription(description);
-				product.setPrice(price);
+                Product product = productRepository.findById(productId).orElse(new Product());
+                product.setId(productId);
+                product.setName(name);
+                product.setDescription(description);
+                product.setPrice(price);
 
-				productRepository.save(product);
-			}
-		}
-	}
+                productRepository.save(product);
+            }
+        }
+    }
 }

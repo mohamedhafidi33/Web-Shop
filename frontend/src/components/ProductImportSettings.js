@@ -10,6 +10,40 @@ function getCsrfToken() {
   return match ? decodeURIComponent(match.split("=")[1]) : "";
 }
 
+function authHeaders() {
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
+    "X-XSRF-TOKEN": getCsrfToken(),
+  };
+}
+
+async function getJsonOrText(res) {
+  const ct = res.headers.get("content-type") || "";
+  if (ct.includes("application/json")) return await res.json();
+  return await res.text();
+}
+
+// Helper to format timestamps as readable string
+function formatDate(val) {
+  if (!val) return "";
+  try {
+    const d =
+      typeof val === "string" || typeof val === "number" ? new Date(val) : val;
+    if (isNaN(d?.getTime?.())) return String(val);
+    return new Intl.DateTimeFormat(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(d);
+  } catch {
+    return String(val);
+  }
+}
+
 /* Minimal SVG icon set (premium, neutral) */
 const Icon = {
   Pencil: (p) => (
@@ -191,6 +225,7 @@ const ProductSyncSettings = () => {
   const [filePath, setFilePath] = useState("/path/to/sync/file");
   const [isRunning, setIsRunning] = useState(false);
   const [lastImport, setLastImport] = useState(null);
+  const [statusLabel, setStatusLabel] = useState("Idle");
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -201,7 +236,11 @@ const ProductSyncSettings = () => {
     if (saved.username) setUsername(saved.username);
     if (saved.password) setPassword(saved.password);
     if (saved.period) setPeriod(saved.period);
-    if (saved.lastImport) setLastImport(saved.lastImport);
+    if (saved.lastImport) setLastImport(formatDate(saved.lastImport));
+    fetchStatus();
+    const t = setInterval(fetchStatus, 5000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -209,6 +248,51 @@ const ProductSyncSettings = () => {
     localStorage.setItem("productSyncSettings", JSON.stringify(data));
   }, [endpoint, username, password, period, lastImport]);
   const [notice, setNotice] = useState({ type: null, text: "" }); // type: 'success' | 'error'
+
+  // Fetch status from backend and update running state and visual state.
+  const fetchStatus = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/import/admin/status`, {
+        method: "GET",
+        credentials: "include",
+        headers: authHeaders(),
+      });
+      const payload = await getJsonOrText(res);
+      if (!res.ok) return; // keep UI as-is on error
+
+      // Backward compatibility: old endpoint returned plain text
+      if (typeof payload === "string") {
+        const t = payload.trim().toLowerCase();
+        const running = t === "running";
+        setIsRunning(running);
+        setStatusLabel(running ? "Running" : "Idle");
+        return;
+      }
+
+      // New JSON: { running: boolean, lastImport: string|null, period: string|number }
+      if (payload && typeof payload === "object") {
+        if (typeof payload.running === "boolean") {
+          setIsRunning(payload.running);
+          setStatusLabel(payload.running ? "Running" : "Idle");
+        }
+        if ("lastImport" in payload)
+          setLastImport(formatDate(payload.lastImport));
+        if (payload.period) {
+          if (typeof payload.period === "number") {
+            setPeriod(payload.period);
+          } else if (typeof payload.period === "string") {
+            const m = payload.period.match(/^\*\/(\d+)\s/);
+            if (m) {
+              const n = Number(m[1]);
+              if (!isNaN(n)) setPeriod(n);
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // ignore network errors here
+    }
+  };
 
   const extractOrigin = (urlStr) => {
     if (!urlStr) return null;
@@ -227,27 +311,17 @@ const ProductSyncSettings = () => {
   };
 
   const refreshServerStatus = async () => {
-    const origin = extractOrigin(endpoint);
+    let origin = extractOrigin(endpoint);
     if (!origin) {
       setServerStatus("unknown");
       return;
     }
+    origin = origin.replace("host.docker.internal", "localhost");
     try {
-      const head = await fetch(origin, {
-        method: "HEAD",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-        },
-      });
-      setServerStatus(head.ok ? "online" : "offline");
-    } catch (e) {
-      try {
-        await fetch(origin, { method: "GET", mode: "no-cors" });
-        setServerStatus("online");
-      } catch {
-        setServerStatus("offline");
-      }
+      await fetch(origin, { method: "GET", mode: "no-cors" });
+      setServerStatus("online");
+    } catch {
+      setServerStatus("offline");
     }
   };
 
@@ -274,18 +348,36 @@ const ProductSyncSettings = () => {
     return cron;
   }
 
-  const toggleEndpointEdit = () => setEndpointEdit(!endpointEdit);
+  // Convert backend cron mention (e.g., "*/60 * * * * *") inside messages to human-readable text
+  function normalizeBackendMessage(msg) {
+    if (!msg || typeof msg !== "string") return msg;
+    // Match patterns like '*/N * * * * *'
+    const m = msg.match(/\*\/(\d+)\s+\*\s+\*\s+\*\s+\*\s+\*/);
+    if (m) {
+      const n = Number(m[1]);
+      const human = n === 1 ? "every 1 second" : `every ${n} seconds`;
+      return msg.replace(/\*\/\d+\s+\*\s+\*\s+\*\s+\*\s+\*/, human);
+    }
+    return msg;
+  }
+  const toggleEndpointEdit = async () => {
+    if (endpointEdit) {
+      // We are saving now; normalize host and refresh status
+      const normalized = endpoint.includes("host.docker.internal")
+        ? endpoint.replace("host.docker.internal", "localhost")
+        : endpoint;
+      if (normalized !== endpoint) setEndpoint(normalized);
+      await refreshServerStatus();
+    }
+    setEndpointEdit(!endpointEdit);
+  };
   const handleStart = async () => {
     try {
       const cron = toCron(period);
       const res = await fetch(`${BASE_URL}/import/admin/start`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-          "X-XSRF-TOKEN": getCsrfToken(),
-        },
+        headers: authHeaders(),
         body: JSON.stringify({ endpoint, username, password, period: cron }),
       });
       const msg = await res.text();
@@ -298,9 +390,12 @@ const ProductSyncSettings = () => {
         });
         return;
       }
+      await fetchStatus();
       setIsRunning(true);
-      setLastImport(new Date().toLocaleString());
-      setNotice({ type: "success", text: msg || "Scheduled" });
+      setNotice({
+        type: "success",
+        text: normalizeBackendMessage(msg || "Scheduled"),
+      });
     } catch (e) {
       setNotice({ type: "error", text: e?.message || "Start failed" });
     }
@@ -310,11 +405,7 @@ const ProductSyncSettings = () => {
       const res = await fetch(`${BASE_URL}/import/admin/stop`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-          "X-XSRF-TOKEN": getCsrfToken(),
-        },
+        headers: authHeaders(),
         body: JSON.stringify({}),
       });
       const msg = await res.text();
@@ -327,6 +418,7 @@ const ProductSyncSettings = () => {
         });
         return;
       }
+      await fetchStatus();
       setIsRunning(false);
       setNotice({ type: "success", text: msg || "Stopped" });
     } catch (e) {
@@ -338,11 +430,7 @@ const ProductSyncSettings = () => {
       const res = await fetch(`${BASE_URL}/import/admin/run-now`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-          "X-XSRF-TOKEN": getCsrfToken(),
-        },
+        headers: authHeaders(),
         body: JSON.stringify({ endpoint, username, password }),
       });
       const msg = await res.text();
@@ -355,8 +443,12 @@ const ProductSyncSettings = () => {
         });
         return;
       }
-      setLastImport(new Date().toLocaleString());
-      setNotice({ type: "success", text: msg || "Executed" });
+      await fetchStatus();
+      setLastImport(formatDate(new Date()));
+      setNotice({
+        type: "success",
+        text: normalizeBackendMessage(msg || "Executed"),
+      });
     } catch (e) {
       setNotice({ type: "error", text: e?.message || "Run failed" });
     }
@@ -387,6 +479,31 @@ const ProductSyncSettings = () => {
       ? "#fca5a5"
       : tone.subtext;
 
+  // Visual indicator bar styles
+  const runningBarStyle = {
+    width: "100%",
+    padding: "10px 0",
+    marginBottom: 18,
+    borderRadius: 10,
+    background: isRunning ? "rgba(34,197,94,0.22)" : tone.border,
+    color: isRunning ? "#caffd7" : tone.subtext,
+    fontWeight: 700,
+    fontSize: 15,
+    textAlign: "center",
+    boxShadow: isRunning
+      ? "0 0 16px 2px rgba(34,197,94,0.18), 0 1px 0 0 #193d24"
+      : "none",
+    border: isRunning
+      ? `1.5px solid ${tone.success}`
+      : `1px solid ${tone.border}`,
+    letterSpacing: 0.2,
+    transition: "background .25s, color .18s, box-shadow .18s",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  };
+
   return (
     <div style={{ minHeight: "100vh", background: tone.pageBg }}>
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "56px 24px" }}>
@@ -415,6 +532,20 @@ const ProductSyncSettings = () => {
             padding: 28,
           }}
         >
+          {/* Running/Idle visual indicator bar */}
+          <div style={runningBarStyle}>
+            {isRunning ? (
+              <>
+                <Icon.Dot color={tone.success} />
+                <span>Running</span>
+              </>
+            ) : (
+              <>
+                <Icon.Dot color={tone.muted} />
+                <span>Idle</span>
+              </>
+            )}
+          </div>
           {notice.type && (
             <div
               style={{

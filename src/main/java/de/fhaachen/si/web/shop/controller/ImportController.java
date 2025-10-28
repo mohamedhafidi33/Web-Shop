@@ -1,6 +1,8 @@
 package de.fhaachen.si.web.shop.controller;
 
 import java.util.concurrent.ScheduledFuture;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
@@ -34,6 +36,7 @@ public class ImportController {
 			if (scheduled != null && !scheduled.isCancelled()) {
 				scheduled.cancel(false);
 			}
+			scheduler.setLastPeriod(dto.getPeriod());
 			scheduled = taskScheduler.schedule(
 					() -> scheduler.syncProducts(dto.getEndpoint(), dto.getUsername(), dto.getPassword()),
 					new CronTrigger(dto.getPeriod()));
@@ -65,4 +68,20 @@ public class ImportController {
 			return ResponseEntity.badRequest().body("Run failed: " + e.getMessage());
 		}
 	}
+
+    @org.springframework.web.bind.annotation.GetMapping("/status")
+    public ResponseEntity<Map<String, Object>> getStatus() {
+        try {
+            boolean hasSchedule = (scheduled != null && !scheduled.isCancelled());
+            Map<String, Object> body = new HashMap<>();
+            body.put("running", hasSchedule);
+            body.put("lastImport", scheduler.getLastImport());
+            body.put("period", scheduler.getLastPeriod());
+            return ResponseEntity.ok(body);
+        } catch (Exception e) {
+            Map<String, Object> err = new HashMap<>();
+            err.put("error", "Status check failed: " + e.getMessage());
+            return ResponseEntity.badRequest().body(err);
+        }
+    }
 }
