@@ -9,10 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import de.fhaachen.si.web.shop.dto.ProductSyncDTO;
 import de.fhaachen.si.web.shop.service.ProductService;
 
 @RestController
@@ -29,18 +29,15 @@ public class ImportController {
 	private ScheduledFuture<?> scheduled;
 
 	@PostMapping("/start")
-	public ResponseEntity<String> start(@RequestParam String endpoint,
-			@RequestParam String username,
-			@RequestParam String password,
-			@RequestParam String period) {
+	public ResponseEntity<String> start(@RequestBody ProductSyncDTO dto) {
 		try {
 			if (scheduled != null && !scheduled.isCancelled()) {
 				scheduled.cancel(false);
 			}
 			scheduled = taskScheduler.schedule(
-					() -> scheduler.syncProducts(endpoint, username, password),
-					new CronTrigger(period));
-			return ResponseEntity.ok("Scheduled with period: " + period);
+					() -> scheduler.syncProducts(dto.getEndpoint(), dto.getUsername(), dto.getPassword()),
+					new CronTrigger(dto.getPeriod()));
+			return ResponseEntity.ok("Scheduled with period: " + dto.getPeriod());
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body("Start failed: " + e.getMessage());
 		}
@@ -60,11 +57,9 @@ public class ImportController {
 	}
 
 	@PostMapping("/run-now")
-	public ResponseEntity<String> runNow(@RequestParam String endpoint,
-			@RequestParam String username,
-			@RequestParam String password) {
+	public ResponseEntity<String> runNow(@RequestBody ProductSyncDTO dto) {
 		try {
-			scheduler.syncProducts(endpoint, username, password);
+			scheduler.syncProducts(dto.getEndpoint(), dto.getUsername(), dto.getPassword());
 			return ResponseEntity.ok("Executed");
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body("Run failed: " + e.getMessage());

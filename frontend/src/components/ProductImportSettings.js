@@ -251,33 +251,43 @@ const ProductSyncSettings = () => {
     }
   };
 
+  // toCron returns the cron string for backend, or just the number for display
   const toCron = (secs) => {
     const n = Number(secs) || 0;
     if (n <= 0) return "*/30 * * * * *"; // default 30s
     return `*/${n} * * * * *`;
   };
 
+  // Helper to convert cron string to human-readable period
+  function cronToReadable(cron) {
+    // expects format "*/N * * * * *"
+    if (typeof cron !== "string") return "";
+    const m = cron.match(/^\*\/(\d+)\s/);
+    if (m) {
+      const n = Number(m[1]);
+      if (!isNaN(n)) {
+        if (n === 1) return "1 second";
+        return `${n} seconds`;
+      }
+    }
+    // fallback
+    return cron;
+  }
+
   const toggleEndpointEdit = () => setEndpointEdit(!endpointEdit);
   const handleStart = async () => {
     try {
       const cron = toCron(period);
-      const params = new URLSearchParams({
-        endpoint,
-        username,
-        password,
-        period: cron,
+      const res = await fetch(`${BASE_URL}/import/admin/start`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
+          "X-XSRF-TOKEN": getCsrfToken(),
+        },
+        body: JSON.stringify({ endpoint, username, password, period: cron }),
       });
-      const res = await fetch(
-        `${BASE_URL}/import/admin/start?${params.toString()}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-            "X-XSRF-TOKEN": getCsrfToken(),
-          },
-        }
-      );
       const msg = await res.text();
       if (!res.ok) {
         setNotice({
@@ -301,9 +311,11 @@ const ProductSyncSettings = () => {
         method: "POST",
         credentials: "include",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
           "X-XSRF-TOKEN": getCsrfToken(),
         },
+        body: JSON.stringify({}),
       });
       const msg = await res.text();
       if (!res.ok) {
@@ -323,18 +335,16 @@ const ProductSyncSettings = () => {
   };
   const handleRun = async () => {
     try {
-      const params = new URLSearchParams({ endpoint, username, password });
-      const res = await fetch(
-        `${BASE_URL}/import/admin/run-now?${params.toString()}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-            "X-XSRF-TOKEN": getCsrfToken(),
-          },
-        }
-      );
+      const res = await fetch(`${BASE_URL}/import/admin/run-now`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
+          "X-XSRF-TOKEN": getCsrfToken(),
+        },
+        body: JSON.stringify({ endpoint, username, password }),
+      });
       const msg = await res.text();
       if (!res.ok) {
         setNotice({
@@ -547,6 +557,12 @@ const ProductSyncSettings = () => {
                 }
                 onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
               />
+              <div style={{ marginTop: 6, color: tone.subtext, fontSize: 13 }}>
+                Period:{" "}
+                <span style={{ color: tone.text }}>
+                  {cronToReadable(toCron(period))}
+                </span>
+              </div>
             </div>
 
             {/* Actions */}
