@@ -214,10 +214,11 @@ const ActionBtn = ({ variant = "primary", disabled, onClick, children }) => {
 };
 
 const ProductSyncSettings = () => {
-  const [endpointEdit, setEndpointEdit] = useState(false);
+  const [endpointEdit, setEndpointEdit] = useState(true);
   const [endpoint, setEndpoint] = useState(
     "https://api.example.com/productsync"
   );
+  const [endpointDraft, setEndpointDraft] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [serverStatus, setServerStatus] = useState("unknown");
@@ -384,17 +385,22 @@ const ProductSyncSettings = () => {
     return msg;
   }
   const toggleEndpointEdit = async () => {
-    if (endpointEdit) {
-      // We are saving now; normalize host and refresh status
-      const normalized = endpoint.includes("host.docker.internal")
-        ? endpoint.replace("host.docker.internal", "localhost")
-        : endpoint;
-      if (normalized !== endpoint) setEndpoint(normalized);
-      await refreshServerStatus();
-      setIsEditing(false);
-      stoppedDuringEdit.current = false;
+    if (!endpointEdit) {
+      // entering edit mode: copy current endpoint into draft
+      setEndpointDraft(endpoint);
+      setIsEditing(true);
+      setEndpointEdit(true);
+      return;
     }
-    setEndpointEdit(!endpointEdit);
+    // leaving edit mode (save): commit draft
+    const committed = (endpointDraft || endpoint).trim();
+    if (committed) {
+      setEndpoint(committed); // keep original host, do not normalize here
+      await refreshServerStatus();
+    }
+    setIsEditing(false);
+    stoppedDuringEdit.current = false;
+    setEndpointEdit(false);
   };
   const handleStart = async () => {
     try {
@@ -600,10 +606,10 @@ const ProductSyncSettings = () => {
                     ref={endpointInputRef}
                     id="endpoint"
                     type="text"
-                    value={endpoint}
+                    value={endpointDraft}
                     onChange={(e) => {
                       beginEdit();
-                      setEndpoint(e.target.value);
+                      setEndpointDraft(e.target.value);
                     }}
                     style={{
                       ...inputBase,
@@ -613,15 +619,25 @@ const ProductSyncSettings = () => {
                     onFocus={(e) =>
                       (e.currentTarget.style.boxShadow = `0 0 0 3px rgba(55,93,251,.25)`)
                     }
-                    onBlur={(e) => {
+                    onBlur={async (e) => {
                       e.currentTarget.style.boxShadow = "none";
+                      // Commit draft on blur
+                      const committed = (endpointDraft ?? endpoint).trim();
+                      if (committed) {
+                        setEndpoint(committed); // keep original host, do not normalize here
+                        await refreshServerStatus();
+                      }
                       setIsEditing(false);
                       stoppedDuringEdit.current = false;
                     }}
                   />
                 ) : (
                   <div
-                    onClick={() => setEndpointEdit(true)}
+                    onClick={() => {
+                      setEndpointDraft(endpoint);
+                      setIsEditing(true);
+                      setEndpointEdit(true);
+                    }}
                     title="Click to edit endpoint"
                     style={{
                       ...inputBase,
