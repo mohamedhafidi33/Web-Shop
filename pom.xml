@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>de.fhaachen.si</groupId>
 	<artifactId>web-shop</artifactId>
-	<version>2.0.x</version>
+	<version>2.0.0</version>
 	<name>WEB-SHOP-APPLICATION</name>
 	<description>Web Shop Application</description>
 	<url/>
