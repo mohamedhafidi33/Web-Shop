@@ -226,7 +226,10 @@ const ProductSyncSettings = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [lastImport, setLastImport] = useState(null);
   const [statusLabel, setStatusLabel] = useState("Idle");
+  const [isEditing, setIsEditing] = useState(false);
+  const stoppedDuringEdit = useRef(false);
   const fileInputRef = useRef(null);
+  const endpointInputRef = useRef(null);
 
   useEffect(() => {
     const saved = JSON.parse(
@@ -238,20 +241,40 @@ const ProductSyncSettings = () => {
     if (saved.period) setPeriod(saved.period);
     if (saved.lastImport) setLastImport(formatDate(saved.lastImport));
     fetchStatus();
-    const t = setInterval(fetchStatus, 5000);
-    return () => clearInterval(t);
     // eslint-disable-next-line
   }, []);
+  useEffect(() => {
+    if (isEditing || !isRunning) return; // only poll when running and not editing
+    const t = setInterval(fetchStatus, 5000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing, isRunning]);
 
   useEffect(() => {
     const data = { endpoint, username, password, period, lastImport };
     localStorage.setItem("productSyncSettings", JSON.stringify(data));
   }, [endpoint, username, password, period, lastImport]);
+  useEffect(() => {
+    if (endpointEdit && endpointInputRef.current) {
+      endpointInputRef.current.focus();
+      endpointInputRef.current.select();
+    }
+  }, [endpointEdit]);
   const [notice, setNotice] = useState({ type: null, text: "" }); // type: 'success' | 'error'
+
+  const beginEdit = () => {
+    if (!isEditing) setIsEditing(true);
+    if (isRunning && !stoppedDuringEdit.current) {
+      stoppedDuringEdit.current = true;
+      // fire-and-forget; do not block typing
+      handleStop().catch(() => {});
+    }
+  };
 
   // Fetch status from backend and update running state and visual state.
   const fetchStatus = async () => {
     try {
+      if (isEditing) return; // pause polling while the user edits
       const res = await fetch(`${BASE_URL}/import/admin/status`, {
         method: "GET",
         credentials: "include",
@@ -368,6 +391,8 @@ const ProductSyncSettings = () => {
         : endpoint;
       if (normalized !== endpoint) setEndpoint(normalized);
       await refreshServerStatus();
+      setIsEditing(false);
+      stoppedDuringEdit.current = false;
     }
     setEndpointEdit(!endpointEdit);
   };
@@ -572,10 +597,14 @@ const ProductSyncSettings = () => {
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 {endpointEdit ? (
                   <input
+                    ref={endpointInputRef}
                     id="endpoint"
                     type="text"
                     value={endpoint}
-                    onChange={(e) => setEndpoint(e.target.value)}
+                    onChange={(e) => {
+                      beginEdit();
+                      setEndpoint(e.target.value);
+                    }}
                     style={{
                       ...inputBase,
                       borderColor: tone.inputBorder,
@@ -584,10 +613,16 @@ const ProductSyncSettings = () => {
                     onFocus={(e) =>
                       (e.currentTarget.style.boxShadow = `0 0 0 3px rgba(55,93,251,.25)`)
                     }
-                    onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
+                    onBlur={(e) => {
+                      e.currentTarget.style.boxShadow = "none";
+                      setIsEditing(false);
+                      stoppedDuringEdit.current = false;
+                    }}
                   />
                 ) : (
                   <div
+                    onClick={() => setEndpointEdit(true)}
+                    title="Click to edit endpoint"
                     style={{
                       ...inputBase,
                       display: "flex",
@@ -595,6 +630,7 @@ const ProductSyncSettings = () => {
                       borderStyle: "dashed",
                       color: tone.subtext,
                       flex: 1,
+                      cursor: "text",
                     }}
                   >
                     {endpoint}
@@ -656,8 +692,16 @@ const ProductSyncSettings = () => {
                 id="username"
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  beginEdit();
+                  setUsername(e.target.value);
+                }}
+                onFocus={() => beginEdit()}
                 style={inputBase}
+                onBlur={() => {
+                  setIsEditing(false);
+                  stoppedDuringEdit.current = false;
+                }}
               />
             </div>
 
@@ -668,8 +712,16 @@ const ProductSyncSettings = () => {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  beginEdit();
+                  setPassword(e.target.value);
+                }}
+                onFocus={() => beginEdit()}
                 style={inputBase}
+                onBlur={() => {
+                  setIsEditing(false);
+                  stoppedDuringEdit.current = false;
+                }}
               />
             </div>
 
@@ -681,12 +733,20 @@ const ProductSyncSettings = () => {
                 type="number"
                 min={1}
                 value={period}
-                onChange={(e) => setPeriod(Number(e.target.value))}
+                onChange={(e) => {
+                  beginEdit();
+                  setPeriod(Number(e.target.value));
+                }}
                 style={inputBase}
-                onFocus={(e) =>
-                  (e.currentTarget.style.boxShadow = `0 0 0 3px rgba(55,93,251,.25)`)
-                }
-                onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
+                onFocus={(e) => {
+                  beginEdit();
+                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(55,93,251,.25)`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.boxShadow = "none";
+                  setIsEditing(false);
+                  stoppedDuringEdit.current = false;
+                }}
               />
               <div style={{ marginTop: 6, color: tone.subtext, fontSize: 13 }}>
                 Period:{" "}
@@ -727,24 +787,26 @@ const ProductSyncSettings = () => {
             </div>
 
             {/* Meta */}
-            <div
-              style={{
-                gridColumn: "1 / -1",
-                marginTop: 6,
-                paddingTop: 16,
-                borderTop: `1px solid ${tone.border}`,
-                color: tone.subtext,
-                fontSize: 13,
-                display: "flex",
-                gap: 24,
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <span style={{ color: tone.text }}>Last Import:</span>{" "}
-                {lastImport || "Never"}
+            {lastImport && (
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  marginTop: 6,
+                  paddingTop: 16,
+                  borderTop: `1px solid ${tone.border}`,
+                  color: tone.subtext,
+                  fontSize: 13,
+                  display: "flex",
+                  gap: 24,
+                  flexWrap: "wrap",
+                }}
+              >
+                <div>
+                  <span style={{ color: tone.text }}>Last Import:</span>{" "}
+                  {lastImport}
+                </div>
               </div>
-            </div>
+            )}
           </form>
         </div>
       </div>
