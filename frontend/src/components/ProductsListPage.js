@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function ProductsListPage() {
   const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+  const FALLBACK_IMAGE =
+    "https://images.unsplash.com/photo-1622428051717-dcd8412959de?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1480";
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,12 +152,10 @@ export default function ProductsListPage() {
               >
                 <td style={td}>
                   <img
-                    src={p.imageUrl || "/fallback-product.png"}
+                    src={p.imageUrl || FALLBACK_IMAGE}
                     alt={p.name}
                     style={thumb}
-                    onError={(e) =>
-                      (e.currentTarget.src = "/fallback-product.png")
-                    }
+                    onError={(e) => (e.currentTarget.src = FALLBACK_IMAGE)}
                   />
                 </td>
                 <td style={td}>
@@ -184,7 +184,7 @@ export default function ProductsListPage() {
                 <td style={emptyTd} colSpan={4}>
                   <div style={emptyBox}>
                     <img
-                      src="/fallback-product.png"
+                      src={FALLBACK_IMAGE}
                       alt=""
                       style={{
                         width: 64,

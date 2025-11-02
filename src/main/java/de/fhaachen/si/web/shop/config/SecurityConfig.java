@@ -27,31 +27,33 @@ import de.fhaachen.si.web.shop.service.CustomUserDetailsService;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-	@Autowired
+    @Autowired
     protected JwtAuthFilter jwtAuthFilter;
-	
-	@Autowired
+
+    @Autowired
     protected CustomUserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/products/**").permitAll()
-                .requestMatchers("/customers/**").authenticated()
-                .requestMatchers("/orders/**").authenticated()
-                .requestMatchers("/products/admin/**").hasRole("ADMIN")
-                .requestMatchers("/customers/admin/**").hasRole("ADMIN")
-                .requestMatchers("/orders/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer
+                        .configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/products/**").permitAll()
+                        .requestMatchers("/customers/**").authenticated()
+                        .requestMatchers("/orders/**").authenticated()
+                        .requestMatchers("/import/**").authenticated()
+                        .requestMatchers("/products/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/customers/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/orders/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/import/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
-    
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

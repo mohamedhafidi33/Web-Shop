@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>de.fhaachen.si</groupId>
 	<artifactId>web-shop</artifactId>
-	<version>2.0.x-SNAPSHOT</version>
+	<version>3.0.x-SNAPSHOT</version>
 	<name>WEB-SHOP-APPLICATION</name>
 	<description>Web Shop Application</description>
 	<url/>

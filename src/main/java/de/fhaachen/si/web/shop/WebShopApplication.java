@@ -18,20 +18,20 @@ import de.fhaachen.si.web.shop.repository.ProductRepository;
 @SpringBootApplication
 @EnableScheduling
 public class WebShopApplication {
-	
-	@Value("${web.shop.admin.email}")
-	private String adminEmail;
 
-	@Value("${web.shop.admin.password}")
-	private String adminPassword;
+    @Value("${web.shop.admin.email}")
+    private String adminEmail;
+
+    @Value("${web.shop.admin.password}")
+    private String adminPassword;
 
     public static void main(String[] args) {
         SpringApplication.run(WebShopApplication.class, args);
     }
 
     @Bean
-	CommandLineRunner initDatabase(ProductRepository productRepository, CustomerRepository customerRepository,
-			PasswordEncoder passwordEncoder) {
+    CommandLineRunner initDatabase(ProductRepository productRepository, CustomerRepository customerRepository,
+            PasswordEncoder passwordEncoder) {
         return args -> {
             if (productRepository.count() == 0) {
                 Product p1 = new Product();
@@ -63,16 +63,16 @@ public class WebShopApplication {
             } else {
                 System.out.println("Products already exist.");
             }
-            
-			Customer admin = new Customer();
-			User user = new User();
-			user.setEmail(adminEmail);
-			user.setPassword(passwordEncoder.encode(adminPassword));
-			user.setRole(Role.ADMIN);
-			admin.setUser(user);
 
-			customerRepository.save(admin);
-			System.out.println("Default admin account created:");
+            Customer admin = new Customer();
+            User user = new User();
+            user.setEmail(adminEmail);
+            user.setPassword(passwordEncoder.encode(adminPassword));
+            user.setRole(Role.ADMIN);
+            admin.setUser(user);
+
+            customerRepository.save(admin);
+            System.out.println("Default admin account created:");
         };
     }
 
