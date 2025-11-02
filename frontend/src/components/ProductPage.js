@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
 
 function ProductPage({ products, cart, setCart }) {
   const { id } = useParams();
   const p = products.find((item) => item.id === Number(id));
   const [qty, setQty] = useState(1);
+  const [stock, setStock] = useState(null); // null = not loaded yet
+
+  useEffect(() => {
+    // Fetch stock as a plain number; set -1 on error
+    fetch(`${API_BASE}/products/stock/${id}`)
+      .then((r) => (r.ok ? r.text() : Promise.reject()))
+      .then((t) => setStock(Number.parseInt(t, 10)))
+      .catch(() => setStock(-1));
+  }, [id]);
+
   const getImage = (p) =>
     p && p.imageUrl && p.imageUrl.trim() !== ""
       ? p.imageUrl
@@ -36,6 +48,17 @@ function ProductPage({ products, cart, setCart }) {
           <h1 className="h3 mb-2">{p.name}</h1>
           <p className="text-muted">{p.description}</p>
           <div className="fs-4 fw-semibold mb-3">{p.price} €</div>
+          {stock !== null && (
+            <div className="mb-2">
+              {stock < 0 ? (
+                <span className="text-danger">Error getting stock</span>
+              ) : stock === 0 ? (
+                <span className="text-danger">Out of stock</span>
+              ) : (
+                <span className="text-success">In stock: {stock}</span>
+              )}
+            </div>
+          )}
           <div className="d-flex align-items-center gap-2 mb-3">
             <span className="text-muted">Quantity</span>
             <div
@@ -66,6 +89,7 @@ function ProductPage({ products, cart, setCart }) {
           </div>
           <div className="d-flex gap-2">
             <button
+              disabled={stock === 0}
               className="btn btn-dark"
               onClick={() => {
                 addToCart(p, qty);
