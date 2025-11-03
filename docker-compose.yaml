@@ -13,7 +13,7 @@ services:
       - REACT_APP_API_URL=http://localhost:8080
   spring:
     build: .
-    image: web-shop-spring:2.0
+    image: web-shop-spring:3.0
     container_name: web-shop-spring
     ports:
       - "8080:8080"
