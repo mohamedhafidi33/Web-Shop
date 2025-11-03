@@ -74,4 +74,4 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/web-shop:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/web-shop:${{ github.ref_name }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/web-shop:${{ env.TAG }}
