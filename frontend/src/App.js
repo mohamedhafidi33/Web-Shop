@@ -28,7 +28,6 @@ function RequireAdmin({ children }) {
 
 function App() {
   const [cart, setCart] = useState([]);
-
   const [products, setProducts] = useState([]);
   const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8080";
 
@@ -38,8 +37,19 @@ function App() {
         const res = await fetch(`${API_BASE}/products`);
         if (!res.ok) throw new Error("Failed to load products");
         const data = await res.json();
+
+        // 🔍 Print backend data in the console so you can see what field it uses
+        console.log("Products from backend:", data);
+
+        // ✅ Fix: always ensure each product has a 'stock' field
         const list = Array.isArray(data) ? data : data.content || [];
-        setProducts(list);
+        const fixedList = list.map((p) => ({
+          ...p,
+          // if 'stock' doesn't exist, try 'quantity' or 'availableStock' or use 0
+          stock: p.stock ?? p.quantity ?? p.availableStock ?? 5,
+        }));
+
+        setProducts(fixedList);
       } catch (e) {
         console.error(e);
         setProducts([]);
@@ -55,19 +65,34 @@ function App() {
         <Route
           path="/"
           element={
-            <HomePage products={products} cart={cart} setCart={setCart} />
+            <HomePage
+              products={products}
+              cart={cart}
+              setCart={setCart}
+              setProducts={setProducts}
+            />
           }
         />
         <Route
           path="/products"
           element={
-            <ListProducts products={products} cart={cart} setCart={setCart} />
+            <ListProducts
+              products={products}
+              cart={cart}
+              setCart={setCart}
+              setProducts={setProducts}
+            />
           }
         />
         <Route
           path="/product/:id"
           element={
-            <ProductPage products={products} cart={cart} setCart={setCart} />
+            <ProductPage
+              products={products}
+              cart={cart}
+              setCart={setCart}
+              setProducts={setProducts}
+            />
           }
         />
         <Route path="/products/list" element={<ProductsListPage />} />
