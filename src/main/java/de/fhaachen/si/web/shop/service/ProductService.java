@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import de.fhaachen.si.web.shop.entity.Product;
+import de.fhaachen.si.web.shop.grpc.StockClient;
 import de.fhaachen.si.web.shop.repository.ProductRepository;
 
 @Service
@@ -74,6 +75,15 @@ public class ProductService {
 
                 productRepository.save(product);
             }
+        }
+    }
+
+    public int getStockFromGrpc(String productId) {
+        try {
+            StockClient client = new StockClient();
+            return client.getStock(String.valueOf(productId));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch stock: " + e.getMessage(), e);
         }
     }
 }
