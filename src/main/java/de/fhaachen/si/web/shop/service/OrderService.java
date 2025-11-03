@@ -80,7 +80,7 @@ public class OrderService {
     }
 
     public List<Order> getAllOrders() {
-        return orderRepository.findAllWithCustomerAndItems();
+        return orderRepository.findAll();
     }
 
     public Order updateOrderStatus(Long orderId, OrderStatus status) {

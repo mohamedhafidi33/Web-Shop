@@ -19,18 +19,18 @@ public interface OrderMapper {
 	@Mapping(target = "items", source = "orderItems")
 	OrderDTO orderToOrderDTO(Order order);
 
-    // @Mapping(source = "product.id", target = "productId")
-    // @Mapping(source = "product.name", target = "productName")
-    // OrderItemDTO orderItemToOrderItemDTO(OrderItem item);
+    @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "product.name", target = "productName")
+    OrderItemDTO orderItemToOrderItemDTO(OrderItem item);
     
-    // @Mapping(source = "productId", target = "product.id")
-    // OrderItem orderItemDTOToOrderItem(OrderItemDTO dto);
+    @Mapping(source = "productId", target = "product.id")
+    OrderItem orderItemDTOToOrderItem(OrderItemDTO dto);
 	
-	// @Mapping(source = "customerId", target = "customer.id")
-	// @Mapping(source = "customer.name", target = "customerName")
-	// @Mapping(source = "status", target = "status", qualifiedByName = "stringToStatus")
-	// @Mapping(target = "orderItems", source = "items")
-	// Order orderDTOToOrder(OrderDTO orderDTO);
+	@Mapping(source = "customerId", target = "customer.id")
+	@Mapping(source = "customer.name", target = "customerName")
+	@Mapping(source = "status", target = "status", qualifiedByName = "stringToStatus")
+	@Mapping(target = "orderItems", source = "items")
+	Order orderDTOToOrder(OrderDTO orderDTO);
 
 	@Named("statusToString")
 	public static String mapStatusToString(OrderStatus status) {
