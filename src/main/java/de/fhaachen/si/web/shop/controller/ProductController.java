@@ -1,6 +1,7 @@
 package de.fhaachen.si.web.shop.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +23,16 @@ import de.fhaachen.si.web.shop.service.ProductService;
 @RequestMapping("/products")
 public class ProductController {
 
-	@Autowired
-	protected ProductService productService;
-    
-	@Autowired
+    @Autowired
+    protected ProductService productService;
+
+    @Autowired
     protected ProductMapper productMapper;
-    
+
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts().stream().map(product -> productMapper.productToProductDTO(product)).toList());
+        return ResponseEntity.ok(productService.getAllProducts().stream()
+                .map(product -> productMapper.productToProductDTO(product)).toList());
     }
 
     @GetMapping("/{id}")
@@ -56,5 +58,27 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/stock/{id}")
+    public ResponseEntity<?> getProductStock(@PathVariable Long id) {
+        var productOpt = productService.getProductById(id);
+        if (productOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Product product = productOpt.get();
+        String externalId = product.getProductID();
+
+        if (externalId == null || externalId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Product has no valid external ID.");
+        }
+
+        try {
+            int stock = productService.getStockFromGrpc(externalId);
+            return ResponseEntity.ok(stock);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to fetch stock for ID: " + externalId);
+        }
     }
 }
