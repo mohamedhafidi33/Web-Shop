@@ -120,6 +120,14 @@ function Navbar() {
                 <li className="nav-item">
                   <Link
                     className="nav-link text-white fw-semibold"
+                    to="/orders"
+                  >
+                    <i className="bi bi-tools me-1"></i> Orders
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-white fw-semibold"
                     to="/import"
                   >
                     <i className="bi bi-upload me-1"></i> Import Settings

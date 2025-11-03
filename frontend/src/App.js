@@ -16,6 +16,7 @@ import CustomerProfile from "./components/CustomerProfile";
 import CreateProduct from "./components/CreateProduct";
 import PurchaseHistoryPage from "./components/PurchaseHistoryPage";
 import CustomerList from "./components/CustomerList";
+import OrdersList from "./components/OrdersList";
 
 function RequireAdmin({ children }) {
   const token = localStorage.getItem("authToken");
@@ -75,6 +76,7 @@ function App() {
         <Route path="/products/new" element={<CreateProduct />} />
         <Route path="/profile" element={<CustomerProfile />} />
         <Route path="/customers" element={<CustomerList />} />
+        <Route path="/orders" element={<OrdersList />} />
         <Route path="/orders" element={<PurchaseHistoryPage />} />
         <Route
           path="/checkout"
