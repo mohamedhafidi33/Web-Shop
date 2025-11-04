@@ -3,7 +3,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    image: web-shop-react:1.0
+    image: web-shop-react:2.0
     container_name: web-shop-react
     ports:
       - "3000:80"
