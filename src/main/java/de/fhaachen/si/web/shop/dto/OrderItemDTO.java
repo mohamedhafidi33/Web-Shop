@@ -2,16 +2,16 @@ package de.fhaachen.si.web.shop.dto;
 
 public class OrderItemDTO {
 
-	private Long productId;
+	private String productId;
 	private String productName;
 	private Integer quantity;
 	private Double price;
 
-	public Long getProductId() {
+	public String getProductId() {
 		return productId;
 	}
 
-	public void setProductId(Long productId) {
+	public void setProductId(String productId) {
 		this.productId = productId;
 	}
 

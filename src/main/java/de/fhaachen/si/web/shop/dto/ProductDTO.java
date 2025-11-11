@@ -14,6 +14,8 @@ public class ProductDTO {
 	private int stock;
 	
     private String productID;
+    
+    private String currency;
 
 	public Long getId() {
 		return id;
@@ -70,4 +72,14 @@ public class ProductDTO {
 	public void setProductID(String productID) {
 		this.productID = productID;
 	}
+
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
+	
+	
 }

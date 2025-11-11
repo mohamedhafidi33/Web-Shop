@@ -156,32 +156,38 @@ function HomePage({ products, cart, setCart }) {
           </Link>
         </div>
         <div className="row g-4">
-          {featured.map((product) => (
-            <div key={product.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
-              <Link
-                to={`/product/${product.id}`}
-                className="text-decoration-none text-dark"
-              >
-                <div className="card border-0 shadow-sm h-100 position-relative hover-raise">
-                  <img
-                    src={getImage(product)}
-                    alt={product.name}
-                    className="card-img-top"
-                    style={{ height: 240, objectFit: "cover" }}
-                  />
-                  <div className="card-body text-center">
-                    <h5 className="card-title mb-1">{product.name}</h5>
-                    {product.description && (
-                      <p className="text-muted small mb-0">
-                        {product.description}
-                      </p>
-                    )}
-                    <p className="fw-semibold mt-2 mb-0">{product.price} €</p>
+          {featured.map((product) => {
+            // choose correct id field
+            const productKey = product.id ?? product.productID;
+            const productLinkId = product.id ?? product.productID;
+
+            return (
+              <div key={productKey} className="col-12 col-sm-6 col-md-4 col-lg-3">
+                <Link
+                  to={`/product/${productLinkId}`}
+                  className="text-decoration-none text-dark"
+                >
+                  <div className="card border-0 shadow-sm h-100 position-relative hover-raise">
+                    <img
+                      src={getImage(product)}
+                      alt={product.name}
+                      className="card-img-top"
+                      style={{ height: 240, objectFit: "cover" }}
+                    />
+                    <div className="card-body text-center">
+                      <h5 className="card-title mb-1">{product.name}</h5>
+                      {product.description && (
+                        <p className="text-muted small mb-0">
+                          {product.description}
+                        </p>
+                      )}
+                      <p className="fw-semibold mt-2 mb-0">{product.price} €</p>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </section>
     </div>

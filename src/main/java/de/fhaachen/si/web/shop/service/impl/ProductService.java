@@ -1,38 +1,49 @@
-package de.fhaachen.si.web.shop.service;
+package de.fhaachen.si.web.shop.service.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import de.fhaachen.si.web.shop.dto.ProductDTO;
 import de.fhaachen.si.web.shop.entity.Product;
 import de.fhaachen.si.web.shop.grpc.StockClient;
+import de.fhaachen.si.web.shop.mapper.ProductMapper;
 import de.fhaachen.si.web.shop.repository.ProductRepository;
+import de.fhaachen.si.web.shop.service.api.IProductService;
 
 @Service
-public class ProductService {
+@Profile({"local", "default"})
+public class ProductService implements IProductService{
 
     @Autowired
     protected ProductRepository productRepository;
+    
+    @Autowired
+    protected ProductMapper productMapper;
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    @Override
+    public List<ProductDTO> getAllProducts() {
+        return productRepository.findAll().stream().map(productMapper::productToProductDTO).toList();
     }
 
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    @Override
+    public ProductDTO getProductById(String id) {
+        return productMapper.productToProductDTO(productRepository.findById(Long.parseLong(id)).orElse(null));
     }
 
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    @Override
+    public ProductDTO createProduct(ProductDTO product) {
+        return productMapper.productToProductDTO(productRepository.save(productMapper.productDTOToProduct(product)));
     }
 
-    public Product updateProduct(Long id, Product updatedProduct) {
+    @Override
+    public ProductDTO updateProduct(Long id, ProductDTO updatedProduct) {
         return productRepository.findById(id)
                 .map(product -> {
                     product.setName(updatedProduct.getName());
@@ -40,11 +51,12 @@ public class ProductService {
                     product.setPrice(updatedProduct.getPrice());
                     product.setImageUrl(updatedProduct.getImageUrl());
                     product.setStock(updatedProduct.getStock());
-                    return productRepository.save(product);
+                    return productMapper.productToProductDTO(productRepository.save(product));
                 })
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
+    @Override
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
             throw new RuntimeException("Product not found");

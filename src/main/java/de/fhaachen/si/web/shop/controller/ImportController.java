@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import de.fhaachen.si.web.shop.service.ProductSyncScheduler;
+import de.fhaachen.si.web.shop.service.impl.ProductService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,16 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.fhaachen.si.web.shop.dto.ProductSyncDTO;
-import de.fhaachen.si.web.shop.service.ProductService;
 
 @RestController
 @RequestMapping("/import/admin")
 public class ImportController {
 
 	@Autowired
-	protected ProductService productService;
-	@Autowired
 	private TaskScheduler taskScheduler;
+	
 	@Autowired
 	private ProductSyncScheduler scheduler;
 

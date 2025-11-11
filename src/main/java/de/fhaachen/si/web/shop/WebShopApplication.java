@@ -15,7 +15,7 @@ import de.fhaachen.si.web.shop.entity.User;
 import de.fhaachen.si.web.shop.repository.CustomerRepository;
 import de.fhaachen.si.web.shop.repository.ProductRepository;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "de.fhaachen.si.web.shop")
 @EnableScheduling
 public class WebShopApplication {
 
