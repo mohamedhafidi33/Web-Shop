@@ -15,6 +15,7 @@ import de.fhaachen.si.web.shop.mapper.OrderMapper;
 import de.fhaachen.si.web.shop.repository.CustomerRepository;
 import de.fhaachen.si.web.shop.repository.OrderRepository;
 import de.fhaachen.si.web.shop.repository.ProductRepository;
+import de.fhaachen.si.web.shop.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -28,6 +29,9 @@ public class OrderService {
 	
 	@Autowired
     protected CustomerRepository customerRepository;
+
+    @Autowired
+    protected UserRepository userRepository;
 	
 	@Autowired
 	protected OrderMapper orderMapper;
@@ -88,5 +92,24 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(status);
         return orderRepository.save(order);
+    }
+    /**
+     * NEW: return orders for the authenticated user identified by email.
+     * Uses UserRepository to map email -> User -> Customer.
+     */
+    public List<Order> getOrdersForCustomerByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(user -> {
+                    Customer customer = user.getCustomer();
+                    if (customer == null) throw new RuntimeException("Customer information missing for user");
+                    return orderRepository.findByCustomer(customer);
+                })
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+    public void deleteOrder(Long orderId) {
+        if (!orderRepository.existsById(orderId)) {
+            throw new RuntimeException("Order not found");
+        }
+        orderRepository.deleteById(orderId);
     }
 }
