@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public class OrderDTO {
 
 	private String id;
-	private Long customerId;
+	private String customerId;
 	private LocalDateTime createdAt;
 	private String status;
 	private Double totalAmount;
@@ -20,11 +20,11 @@ public class OrderDTO {
 		this.id = id;
 	}
 
-	public Long getCustomerId() {
+	public String getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(Long customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 

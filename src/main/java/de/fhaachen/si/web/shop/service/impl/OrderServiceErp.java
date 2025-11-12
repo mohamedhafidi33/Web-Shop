@@ -1,6 +1,7 @@
 package de.fhaachen.si.web.shop.service.impl;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class OrderServiceErp implements IOrderService {
     @Override
     public OrderDTO createOrderFromDTO(OrderDTO order) {
         OrderRequest req = OrderRequest.newBuilder()
-                .setCustomerId(order.getCustomerId().toString())
+        		    .setCustomerId(UUID.randomUUID().toString())
                 .setOrderDate(LocalDate.now().toString())
                 .setOrderAmount(order.getTotalAmount())
                 .setCurrency("EUR")

@@ -61,7 +61,7 @@ public class OrderService implements IOrderService{
     public OrderDTO createOrderFromDTO(OrderDTO orderDTO) {
         Order order = orderMapper.orderDTOToOrder(orderDTO);
 
-        Customer customer = customerRepository.findById(orderDTO.getCustomerId())
+        Customer customer = customerRepository.findById(Long.parseLong(orderDTO.getCustomerId()))
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         order.setCustomer(customer);
 
