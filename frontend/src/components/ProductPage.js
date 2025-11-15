@@ -8,13 +8,10 @@ function ProductPage({ products, cart, setCart }) {
   const navigate = useNavigate();
 
   const p = useMemo(() => {
-  return products.find(
-    (item) =>
-      item.id?.toString() === id ||
-      item.productID === id
-  );
-}, [products, id]);
-
+    return products.find(
+      (item) => item.id?.toString() === id || item.productID === id
+    );
+  }, [products, id]);
 
   const [qty, setQty] = useState(1);
   const [stock, setStock] = useState(null); // null = not loaded yet

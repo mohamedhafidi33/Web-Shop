@@ -64,7 +64,7 @@ function HomePage({ products, cart, setCart }) {
               </Link>
               {highlight && (
                 <Link
-                  to={`/product/${highlight.id}`}
+                  to={`/product/${highlight.id ?? highlight.productID}`}
                   className="btn btn-outline-light btn-lg"
                 >
                   View featured
@@ -82,7 +82,7 @@ function HomePage({ products, cart, setCart }) {
             {highlight && (
               <div className="col-12 col-lg-8">
                 <Link
-                  to={`/product/${highlight.id}`}
+                  to={`/product/${highlight.id ?? highlight.productID}`}
                   className="text-decoration-none text-white"
                 >
                   <div
@@ -114,7 +114,7 @@ function HomePage({ products, cart, setCart }) {
             {second && (
               <div className="col-12 col-lg-4">
                 <Link
-                  to={`/product/${second.id}`}
+                  to={`/product/${second.id ?? second.productID}`}
                   className="text-decoration-none text-white"
                 >
                   <div
@@ -162,7 +162,10 @@ function HomePage({ products, cart, setCart }) {
             const productLinkId = product.id ?? product.productID;
 
             return (
-              <div key={productKey} className="col-12 col-sm-6 col-md-4 col-lg-3">
+              <div
+                key={productKey}
+                className="col-12 col-sm-6 col-md-4 col-lg-3"
+              >
                 <Link
                   to={`/product/${productLinkId}`}
                   className="text-decoration-none text-dark"
