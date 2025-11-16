@@ -1,7 +1,6 @@
 package de.fhaachen.si.web.shop.service.impl;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +8,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import de.fhaachen.si.web.shop.dto.OrderDTO;
+import de.fhaachen.si.web.shop.dto.OrderItemDTO;
 import de.fhaachen.si.web.shop.entity.OrderStatus;
 import de.fhaachen.si.web.shop.grpc.OrderClient;
+import de.fhaachen.si.web.shop.grpc.OrderItem;
 import de.fhaachen.si.web.shop.grpc.OrderRequest;
 import de.fhaachen.si.web.shop.grpc.OrderResponse;
 import de.fhaachen.si.web.shop.service.api.IOrderService;
@@ -23,17 +24,27 @@ public class OrderServiceErp implements IOrderService {
 
     @Override
     public OrderDTO createOrderFromDTO(OrderDTO order) {
-        OrderRequest req = OrderRequest.newBuilder()
-        		    .setCustomerId(UUID.randomUUID().toString())
+
+        OrderRequest.Builder req = OrderRequest.newBuilder()
+                .setCustomerId(order.getCustomerUUID())
                 .setOrderDate(LocalDate.now().toString())
                 .setOrderAmount(order.getTotalAmount())
-                .setCurrency("EUR")
-                // map items here
-                .build();
+                .setCurrency("EUR");
 
-        OrderResponse res = orderClient.createOrder(req);
-        OrderDTO createdOrder = prepareOrder(res);
-        return createdOrder;
+        int idx = 1;
+        for (OrderItemDTO item : order.getItems()) {
+            OrderItem grpcItem = OrderItem.newBuilder()
+            		    .setItemId(idx)
+                    .setProductUuid(item.getProductUuid())
+                    .setQuantity(item.getQuantity())
+                    .setItemAmount(item.getPrice() != null ? item.getPrice() : 0.0)
+                    .setCurrency("EUR")
+                    .build();
+            req.addItems(grpcItem);
+        }
+
+        OrderResponse res = orderClient.createOrder(req.build());
+        return prepareOrder(res);
     }
 
 

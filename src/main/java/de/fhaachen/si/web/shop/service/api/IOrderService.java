@@ -6,9 +6,14 @@ import de.fhaachen.si.web.shop.dto.OrderDTO;
 import de.fhaachen.si.web.shop.entity.OrderStatus;
 
 public interface IOrderService {
+	
 	public OrderDTO createOrderFromDTO(OrderDTO orderDTO);
+	
 	public List<OrderDTO> getOrdersForCustomer(Long customerId);
+	
 	public List<OrderDTO> getAllOrders();
+	
 	public OrderDTO updateOrderStatus(Long orderId, OrderStatus status);
-	OrderDTO getOrderById(Long id);
+	
+	public OrderDTO getOrderById(Long id);
 }

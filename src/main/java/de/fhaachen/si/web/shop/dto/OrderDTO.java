@@ -11,6 +11,7 @@ public class OrderDTO {
 	private String status;
 	private Double totalAmount;
 	private List<OrderItemDTO> items;
+	private String customerUUID;
 
 	public String getId() {
 		return id;
@@ -58,5 +59,13 @@ public class OrderDTO {
 
 	public void setTotalAmount(Double totalAmount) {
 		this.totalAmount = totalAmount;
+	}
+
+	public String getCustomerUUID() {
+		return customerUUID;
+	}
+
+	public void setCustomerUUID(String customerUUID) {
+		this.customerUUID = customerUUID;
 	}
 }

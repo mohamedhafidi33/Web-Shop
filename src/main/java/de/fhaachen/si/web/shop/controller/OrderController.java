@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.fhaachen.si.web.shop.dto.OrderDTO;
 import de.fhaachen.si.web.shop.entity.OrderStatus;
-import de.fhaachen.si.web.shop.mapper.OrderMapper;
 import de.fhaachen.si.web.shop.service.CustomerService;
 import de.fhaachen.si.web.shop.service.api.IOrderService;
 

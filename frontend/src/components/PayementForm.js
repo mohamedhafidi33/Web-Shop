@@ -61,9 +61,13 @@ function PaymentForm({ cart = [], setCart, total }) {
       const orderPayload = {
         customerId: customer.id,
         totalAmount: computedTotal,
+        customerUUID: customer.customerUUID,
         items: cart.map((item) => ({
           productId: item.id ?? item.productID,
           quantity: item.qty || 1,
+          price: item.price,
+          productUuid: item.productUUID,
+          productName: item.productName,
         })),
       };
 

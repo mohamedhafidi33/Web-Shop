@@ -37,20 +37,17 @@ public class ProductServiceErp implements IProductService{
 
 	@Override
 	public ProductDTO createProduct(ProductDTO productDTO) {
-		// TODO Auto-generated method stub
-		return null;
+        throw new UnsupportedOperationException("Create via ERP not supported here");
 	}
 
 	@Override
 	public void deleteProduct(Long id) {
-		// TODO Auto-generated method stub
-		
+        throw new UnsupportedOperationException("Create via ERP not supported here");
 	}
 
 	@Override
 	public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
-		// TODO Auto-generated method stub
-		return null;
+        throw new UnsupportedOperationException("Create via ERP not supported here");
 	}
 
 	@Override
@@ -66,7 +63,8 @@ public class ProductServiceErp implements IProductService{
 	
     private ProductDTO toDTO(ProductResponse p) {
         ProductDTO dto = new ProductDTO();
-        dto.setProductID(p.getId());
+        dto.setProductID(p.getProductCode());
+        dto.setProductUUID(p.getId());
         dto.setName(p.getName());
         dto.setDescription(p.getDescription());
         dto.setPrice(p.getPrice());

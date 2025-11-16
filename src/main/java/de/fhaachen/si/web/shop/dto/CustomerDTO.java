@@ -1,6 +1,7 @@
 package de.fhaachen.si.web.shop.dto;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CustomerDTO {
 	private Long id;
@@ -16,6 +17,8 @@ public class CustomerDTO {
 	private String password;
 	
 	private String role;
+	
+	private UUID customerUUID;
 
 	public Long getId() {
 		return id;
@@ -71,6 +74,14 @@ public class CustomerDTO {
 
 	public void setRole(String role) {
 		this.role = role;
+	}
+
+	public UUID getCustomerUUID() {
+		return customerUUID;
+	}
+
+	public void setCustomerUUID(UUID customerUUID) {
+		this.customerUUID = customerUUID;
 	}
 	
 }

@@ -14,6 +14,7 @@ import de.fhaachen.si.web.shop.entity.OrderItem;
 public interface OrderMapper {
 
 	@Mapping(source = "customer.id", target = "customerId")
+	@Mapping(source = "customer.customerUUID", target = "customerUUID")
 	@Mapping(source = "status", target = "status", qualifiedByName = "statusToString")
 	@Mapping(target = "items", source = "orderItems")
 	OrderDTO orderToOrderDTO(Order order);
@@ -26,6 +27,7 @@ public interface OrderMapper {
     OrderItem orderItemDTOToOrderItem(OrderItemDTO dto);
 	
 	@Mapping(source = "customerId", target = "customer.id")
+	@Mapping(source = "customerUUID", target = "customer.customerUUID")
 	@Mapping(source = "status", target = "status", qualifiedByName = "stringToStatus")
 	@Mapping(target = "orderItems", source = "items")
 	Order orderDTOToOrder(OrderDTO orderDTO);
