@@ -141,7 +141,7 @@ export default function ProductsListPage() {
           <tbody>
             {items.map((p) => (
               <tr
-                key={p.id}
+                key={p.id ?? p.productID}
                 style={tr}
                 onMouseEnter={(e) =>
                   (e.currentTarget.style.background = "#f9fafb")
@@ -159,7 +159,7 @@ export default function ProductsListPage() {
                   />
                 </td>
                 <td style={td}>
-                  <Link to={`/products/${p.id}`} style={link}>
+                  <Link to={`/products/${p.id ?? p.productID}`} style={link}>
                     {p.name}
                   </Link>
                 </td>
@@ -167,7 +167,7 @@ export default function ProductsListPage() {
                 <td style={tdCenter}>
                   <button
                     style={btnGhostSm}
-                    onClick={() => navigate(`/products/${p.id}`)}
+                    onClick={() => navigate(`/products/${p.id ?? p.productID}`)}
                     title="Open"
                   >
                     Open

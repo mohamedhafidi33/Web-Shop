@@ -2,16 +2,17 @@ package de.fhaachen.si.web.shop.dto;
 
 public class OrderItemDTO {
 
-	private Long productId;
+	private String productId;
 	private String productName;
 	private Integer quantity;
 	private Double price;
+	private String productUUID;
 
-	public Long getProductId() {
+	public String getProductId() {
 		return productId;
 	}
 
-	public void setProductId(Long productId) {
+	public void setProductId(String productId) {
 		this.productId = productId;
 	}
 
@@ -38,4 +39,13 @@ public class OrderItemDTO {
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+
+	public String getProductUuid() {
+		return productUUID;
+	}
+
+	public void setProductUuid(String productUuid) {
+		this.productUUID = productUuid;
+	}
+	
 }

@@ -29,9 +29,9 @@ function ListProducts({ products, cart, setCart }) {
         <h1 className="text-center mb-4">Our Products</h1>
         <div className="row g-4">
           {products.map((p) => (
-            <div className="col-12 col-sm-6 col-md-4" key={p.id}>
+            <div className="col-12 col-sm-6 col-md-4" key={p.id ?? p.productID}>
               <Link
-                to={`/product/${p.id}`}
+                to={`/product/${p.id ?? p.productID}`}
                 state={p}
                 className="text-decoration-none text-dark"
               >

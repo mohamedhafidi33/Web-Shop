@@ -14,7 +14,9 @@ function PaymentForm({ cart = [], setCart, total }) {
     cvc: "",
   });
   const [customer, setCustomer] = useState(localStorage.getItem("customer"));
-  const [isSignedIn, setIsSignedIn] = useState(!!localStorage.getItem("authToken"));
+  const [isSignedIn, setIsSignedIn] = useState(
+    !!localStorage.getItem("authToken")
+  );
 
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
@@ -48,7 +50,7 @@ function PaymentForm({ cart = [], setCart, total }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-/*     if (!customer?.id) {
+    /*     if (!customer?.id) {
       alert("You must be signed in to place an order.");
       return;
     } */
@@ -58,20 +60,28 @@ function PaymentForm({ cart = [], setCart, total }) {
 
       const orderPayload = {
         customerId: customer.id,
+        totalAmount: computedTotal,
+        customerUUID: customer.customerUUID,
         items: cart.map((item) => ({
-          productId: item.id,
+          productId: item.id ?? item.productID,
           quantity: item.qty || 1,
+          price: item.price,
+          productUuid: item.productUUID,
+          productName: item.productName,
         })),
       };
 
-      const response = await fetch(`${API_BASE}/orders/customer/${customer.id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-        },
-        body: JSON.stringify(orderPayload),
-      });
+      const response = await fetch(
+        `${API_BASE}/orders/customer/${customer.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+          },
+          body: JSON.stringify(orderPayload),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to submit order");
 
@@ -154,6 +164,8 @@ function PaymentForm({ cart = [], setCart, total }) {
                       value={formData.name}
                       onChange={handleChange}
                       required
+                      readOnly
+                      disabled
                     />
                   </div>
                   <div className="col-md-6">
@@ -165,6 +177,8 @@ function PaymentForm({ cart = [], setCart, total }) {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      readOnly
+                      disabled
                     />
                   </div>
                   <div className="col-12">
@@ -176,6 +190,8 @@ function PaymentForm({ cart = [], setCart, total }) {
                       value={formData.address}
                       onChange={handleChange}
                       required
+                      readOnly
+                      disabled
                     />
                   </div>
                   <div className="col-md-6">

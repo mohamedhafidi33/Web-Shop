@@ -4,9 +4,6 @@ import org.springframework.stereotype.Component;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
-import si.StockGrpc;
-import si.StockRequest;
-import si.StockResponse;
 
 @Component
 public class StockClient {

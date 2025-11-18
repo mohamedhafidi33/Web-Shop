@@ -1,7 +1,6 @@
 package de.fhaachen.si.web.shop.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,43 +14,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.fhaachen.si.web.shop.dto.ProductDTO;
-import de.fhaachen.si.web.shop.entity.Product;
-import de.fhaachen.si.web.shop.mapper.ProductMapper;
-import de.fhaachen.si.web.shop.service.ProductService;
+import de.fhaachen.si.web.shop.service.api.IProductService;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 
     @Autowired
-    protected ProductService productService;
-
-    @Autowired
-    protected ProductMapper productMapper;
+    protected IProductService productService;
 
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts().stream()
-                .map(product -> productMapper.productToProductDTO(product)).toList());
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return productService.getProductById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable String id) {
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
     @PostMapping("/admin")
     public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO product) {
-        Product created = productService.createProduct(productMapper.productDTOToProduct(product));
-        return ResponseEntity.ok(productMapper.productToProductDTO(created));
+        ProductDTO created = productService.createProduct(product);
+        return ResponseEntity.ok(created);
     }
 
     @PutMapping("/admin/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO product) {
-        Product updated = productService.updateProduct(id, productMapper.productDTOToProduct(product));
-        return ResponseEntity.ok(productMapper.productToProductDTO(updated));
+        ProductDTO updated = productService.updateProduct(id,product);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/admin/{id}")
@@ -61,13 +52,12 @@ public class ProductController {
     }
 
     @GetMapping("/stock/{id}")
-    public ResponseEntity<?> getProductStock(@PathVariable Long id) {
-        var productOpt = productService.getProductById(id);
-        if (productOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<?> getProductStock(@PathVariable String id) {
+        ProductDTO product = productService.getProductById(id);
+		if (product == null) {
+			return ResponseEntity.notFound().build();
+		}
 
-        Product product = productOpt.get();
         String externalId = product.getProductID();
 
         if (externalId == null || externalId.isEmpty()) {

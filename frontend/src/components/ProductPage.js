@@ -7,10 +7,11 @@ function ProductPage({ products, cart, setCart }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const p = useMemo(
-    () => products.find((item) => item.id === Number(id)),
-    [products, id]
-  );
+  const p = useMemo(() => {
+    return products.find(
+      (item) => item.id?.toString() === id || item.productID === id
+    );
+  }, [products, id]);
 
   const [qty, setQty] = useState(1);
   const [stock, setStock] = useState(null); // null = not loaded yet
@@ -29,19 +30,34 @@ function ProductPage({ products, cart, setCart }) {
       ? prod.imageUrl
       : "https://images.unsplash.com/photo-1622428051717-dcd8412959de?auto=format&fit=crop&q=80&w=1600";
 
-  const addToCart = (product, amount = 1) => {
-    const exists = cart.find((item) => item.id === product.id);
-    if (exists) {
-      const updated = cart.map((item) =>
-        item.id === product.id
-          ? { ...item, qty: (item.qty || 1) + amount }
-          : item
-      );
-      setCart(updated);
-    } else {
-      setCart([...cart, { ...product, qty: amount }]);
-    }
-  };
+const addToCart = (product, amount = 1) => {
+  const key = product.id ?? product.productID;
+
+  const exists = cart.find((item) => {
+    return (item.id ?? item.productID) === key;
+  });
+
+  if (exists) {
+    const updated = cart.map((item) =>
+      (item.id ?? item.productID) === key
+        ? { ...item, qty: (item.qty || 1) + amount }
+        : item
+    );
+    setCart(updated);
+  } else {
+    setCart([
+      ...cart,
+      {
+        ...product,
+        qty: amount,
+        productId: product.productID,
+        productUUID: product.productUUID,
+        productName: product.name,
+      },
+    ]);
+  }
+};
+
 
   const formatPrice = (value) =>
     new Intl.NumberFormat(undefined, {

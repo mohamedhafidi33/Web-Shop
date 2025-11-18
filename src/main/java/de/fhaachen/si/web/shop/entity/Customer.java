@@ -1,6 +1,7 @@
 package de.fhaachen.si.web.shop.entity;
 
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -27,6 +28,8 @@ public class Customer {
 
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
 	private List<Order> orders;
+	
+	private UUID customerUUID;
 
 	public Long getId() {
 		return id;
@@ -66,5 +69,13 @@ public class Customer {
 
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;
+	}
+
+	public UUID getCustomerUUID() {
+		return customerUUID;
+	}
+
+	public void setCustomerUUID(UUID customerUUID) {
+		this.customerUUID = customerUUID;
 	}
 }
