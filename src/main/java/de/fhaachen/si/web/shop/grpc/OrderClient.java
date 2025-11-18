@@ -1,5 +1,7 @@
 package de.fhaachen.si.web.shop.grpc;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import io.grpc.ManagedChannel;
@@ -47,5 +49,9 @@ public class OrderClient {
 	            System.err.println("[gRPC] ChangeOrderStatus failed: " + e.getStatus());
 	            throw e;
 	        }
+	    }
+	    
+	    public List<OrderResponse> getAllOrders() {
+	        return stub.getAllOrders(Empty.newBuilder().build()).getOrdersList();
 	    }
 }

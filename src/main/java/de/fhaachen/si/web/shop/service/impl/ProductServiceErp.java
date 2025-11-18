@@ -60,6 +60,10 @@ public class ProductServiceErp implements IProductService{
         }
 	}
 	
+	public List<ProductDTO> getProductByUUID(String uuid) {
+        return getAllProducts().stream().filter(p -> p.getProductUUID().equals(uuid)).collect(Collectors.toList());
+	}
+	
 	
     private ProductDTO toDTO(ProductResponse p) {
         ProductDTO dto = new ProductDTO();
