@@ -17,6 +17,7 @@ function PaymentForm({ cart = [], setCart, total }) {
   const [isSignedIn, setIsSignedIn] = useState(
     !!localStorage.getItem("authToken")
   );
+  const [stockError, setStockError] = useState(null);
 
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
@@ -48,12 +49,79 @@ function PaymentForm({ cart = [], setCart, total }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Async stock validation function
+  const validateStock = async () => {
+    if (!cart || cart.length === 0) return null;
+
+    const itemsWithLatestStock = await Promise.all(
+      cart.map(async (item) => {
+        const stockId =
+          (item.id != null ? item.id.toString() : null) ?? item.productID;
+
+        if (!stockId) {
+          return { item, latestStock: item.stock };
+        }
+
+        try {
+          const res = await fetch(`${API_BASE}/products/stock/${stockId}`);
+          if (!res.ok) throw new Error("Failed to fetch stock");
+          const text = await res.text();
+          const latestStock = Number.parseInt(text, 10);
+          return {
+            item,
+            latestStock: Number.isNaN(latestStock) ? item.stock : latestStock,
+          };
+        } catch (err) {
+          console.error("Error fetching latest stock for", stockId, err);
+          // Fallback to whatever stock we had on the item
+          return { item, latestStock: item.stock };
+        }
+      })
+    );
+
+    const outOfStock = itemsWithLatestStock.filter(
+      ({ latestStock }) => typeof latestStock === "number" && latestStock <= 0
+    );
+    const insufficientStock = itemsWithLatestStock.filter(
+      ({ item, latestStock }) =>
+        typeof latestStock === "number" &&
+        latestStock > 0 &&
+        (item.qty || 1) > latestStock
+    );
+
+    if (outOfStock.length === 0 && insufficientStock.length === 0) {
+      return null;
+    }
+
+    const outOfStockDetails = outOfStock.map(({ item }) => ({
+      name: item.name || item.productName || "Unknown product",
+      requested: item.qty || 1,
+      available: 0,
+    }));
+
+    const insufficientStockDetails = insufficientStock.map(
+      ({ item, latestStock }) => ({
+        name: item.name || item.productName || "Unknown product",
+        requested: item.qty || 1,
+        available: latestStock ?? 0,
+      })
+    );
+
+    return {
+      outOfStock: outOfStockDetails,
+      insufficientStock: insufficientStockDetails,
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    /*     if (!customer?.id) {
-      alert("You must be signed in to place an order.");
+    // Validate stock asynchronously before proceeding
+    const stockProblem = await validateStock();
+    if (stockProblem) {
+      setStockError(stockProblem);
       return;
-    } */
+    }
+    setStockError(null);
 
     try {
       const authToken = localStorage.getItem("authToken");
@@ -153,6 +221,31 @@ function PaymentForm({ cart = [], setCart, total }) {
           <div className="card shadow-sm h-100">
             <div className="card-body">
               <h5 className="card-title mb-3">Payment</h5>
+              {stockError && (
+                <div className="alert alert-danger mb-3" role="alert">
+                  <div className="fw-semibold mb-1">
+                    We couldn&apos;t complete your checkout.
+                  </div>
+                  <div className="small mb-2">
+                    Please adjust the quantities for the products below and try
+                    again.
+                  </div>
+                  <ul className="mb-0 small">
+                    {stockError.outOfStock?.map((p, index) => (
+                      <li key={`oos-${index}`}>
+                        <strong>{p.name}</strong> — out of stock (requested{" "}
+                        {p.requested}, available {p.available})
+                      </li>
+                    ))}
+                    {stockError.insufficientStock?.map((p, index) => (
+                      <li key={`ins-${index}`}>
+                        <strong>{p.name}</strong> — only {p.available} left
+                        (requested {p.requested})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <form onSubmit={handleSubmit}>
                 <div className="row g-3">
                   <div className="col-md-6">

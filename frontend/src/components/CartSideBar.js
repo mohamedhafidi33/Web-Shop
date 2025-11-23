@@ -5,7 +5,16 @@ function CartSideBar({ cart, setCart }) {
   const navigate = useNavigate();
   const inc = (id) =>
     setCart((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, qty: (it.qty || 1) + 1 } : it))
+      prev.map((it) => {
+        if (it.id !== id) return it;
+        const currentQty = it.qty || 1;
+        const maxStock =
+          typeof it.stock === "number" && it.stock > 0 ? it.stock : null;
+        if (maxStock == null) {
+          return { ...it, qty: currentQty + 1 };
+        }
+        return { ...it, qty: Math.min(maxStock, currentQty + 1) };
+      })
     );
   const dec = (id) =>
     setCart((prev) =>
@@ -75,8 +84,13 @@ function CartSideBar({ cart, setCart }) {
                   <button
                     className="btn btn-outline-secondary btn-sm"
                     type="button"
-                    onClick={() => inc(item.id)}
                     aria-label="Increase quantity"
+                    disabled={
+                      typeof item.stock === "number" &&
+                      item.stock > 0 &&
+                      (item.qty || 1) >= item.stock
+                    }
+                    onClick={() => inc(item.id)}
                   >
                     +
                   </button>

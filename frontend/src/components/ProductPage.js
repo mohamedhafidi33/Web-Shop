@@ -25,39 +25,43 @@ function ProductPage({ products, cart, setCart }) {
       .catch(() => setStock(-1));
   }, [id]);
 
+  useEffect(() => {
+    if (stock == null || stock <= 0) return;
+    setQty((current) => Math.min(current, stock));
+  }, [stock]);
+
   const getImage = (prod) =>
     prod && prod.imageUrl && prod.imageUrl.trim() !== ""
       ? prod.imageUrl
       : "https://images.unsplash.com/photo-1622428051717-dcd8412959de?auto=format&fit=crop&q=80&w=1600";
 
-const addToCart = (product, amount = 1) => {
-  const key = product.id ?? product.productID;
+  const addToCart = (product, amount = 1) => {
+    const key = product.id ?? product.productID;
 
-  const exists = cart.find((item) => {
-    return (item.id ?? item.productID) === key;
-  });
+    const exists = cart.find((item) => {
+      return (item.id ?? item.productID) === key;
+    });
 
-  if (exists) {
-    const updated = cart.map((item) =>
-      (item.id ?? item.productID) === key
-        ? { ...item, qty: (item.qty || 1) + amount }
-        : item
-    );
-    setCart(updated);
-  } else {
-    setCart([
-      ...cart,
-      {
-        ...product,
-        qty: amount,
-        productId: product.productID,
-        productUUID: product.productUUID,
-        productName: product.name,
-      },
-    ]);
-  }
-};
-
+    if (exists) {
+      const updated = cart.map((item) =>
+        (item.id ?? item.productID) === key
+          ? { ...item, qty: (item.qty || 1) + amount }
+          : item
+      );
+      setCart(updated);
+    } else {
+      setCart([
+        ...cart,
+        {
+          ...product,
+          qty: amount,
+          productId: product.productID,
+          productUUID: product.productUUID,
+          productName: product.name,
+        },
+      ]);
+    }
+  };
 
   const formatPrice = (value) =>
     new Intl.NumberFormat(undefined, {
@@ -206,7 +210,13 @@ const addToCart = (product, amount = 1) => {
                 className="btn btn-link text-dark text-decoration-none px-3"
                 type="button"
                 aria-label="Increase quantity"
-                onClick={() => setQty((q) => q + 1)}
+                disabled={stock != null && stock > 0 && qty >= stock}
+                onClick={() =>
+                  setQty((q) => {
+                    if (stock == null || stock <= 0) return q + 1;
+                    return Math.min(stock, q + 1);
+                  })
+                }
               >
                 +
               </button>
@@ -216,7 +226,7 @@ const addToCart = (product, amount = 1) => {
           {/* CTA buttons */}
           <div className="d-grid gap-2 gap-md-3 d-md-flex mb-3">
             <button
-              disabled={stock === 0}
+              disabled={stock <= 0}
               className="btn btn-dark btn-lg px-4"
               onClick={() => {
                 addToCart(p, qty);
@@ -230,7 +240,7 @@ const addToCart = (product, amount = 1) => {
               Add to cart
             </button>
             <button
-              disabled={stock === 0}
+              disabled={stock <= 0}
               className="btn btn-outline-dark btn-lg px-4"
               onClick={() => {
                 addToCart(p, qty);
@@ -253,7 +263,7 @@ const addToCart = (product, amount = 1) => {
         <div className="d-flex align-items-center justify-content-between">
           <div className="fw-semibold">{formatPrice(p.price)}</div>
           <button
-            disabled={stock === 0}
+            disabled={stock <= 0}
             className="btn btn-dark"
             onClick={() => addToCart(p, qty)}
           >
