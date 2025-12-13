@@ -1,0 +1,65 @@
+- route:
+    id: order-processing-route
+    from:
+      id: fromeea9
+      uri: kamelet:spring-rabbitmq-source
+      parameters:
+        host: rabbitmq
+        port: 5672
+        queues: orders.request
+        exchangeName: default
+      steps:
+        - convertBodyTo:
+            type: String
+        - log:
+            id: log248e
+            message: '"Received order request: ${body}"'
+        - setBody:
+            id: wrapInOrder
+            expression:
+              simple: '{"order": ${body}}'
+        - log:
+            id: logWrapped
+            message: '"Payload wrapped for ERP: ${body}"'
+        - setHeader:
+            id: setHeader8e8b
+            name: correlationId
+            expression:
+              simple:
+                id: simple1bf6
+                expression: ${header.CamelMessageId}
+        - setHeader:
+            id: setHeaderec56
+            name: Content-Type
+            expression:
+              simple:
+                id: simplecadf
+                expression: application/json
+        - to:
+            id: tob331
+            uri: http
+            parameters:
+              httpMethod: POST
+              httpUri: http://host.docker.internal:4004/rest/api/createOrder
+              authMethod: Basic
+              authUsername: "{{env:ERP_USER}}"
+              authPassword: "{{env:ERP_PASSWORD}}"
+        - log:
+            id: log5688
+            message: '"ERP Response: ${body}"'
+        - marshal:
+            id: marshal0d9a
+            json:
+              id: json8d8f
+              library: Jackson
+        - to:
+            id: tod886
+            uri: kamelet:spring-rabbitmq-sink
+            parameters:
+              host: rabbitmq
+              port: 5672
+              queue: orders.response
+              exchangeName: default
+        - log:
+            id: log7907
+            message: '"Sent ERP response to orders.response queue"'
