@@ -1,6 +1,5 @@
 package de.fhaachen.si.web.shop.rabbitmq.config;
 
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -57,11 +56,19 @@ public class RabbitMQConfig {
     public MessageConverter jsonConverter() {
         return new Jackson2JsonMessageConverter();
     }
+    
+    @Bean
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
 
     @Bean
-    public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory) {
+    public RabbitTemplate rabbitTemplate(
+            ConnectionFactory connectionFactory,
+            Jackson2JsonMessageConverter converter) {
+
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(jsonConverter());
+        template.setMessageConverter(converter);
         return template;
     }
 }

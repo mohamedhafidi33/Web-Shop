@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.fhaachen.si.web.shop.dto.OrderDTO;
 import de.fhaachen.si.web.shop.entity.OrderStatus;
+import de.fhaachen.si.web.shop.rabbitmq.producer.RabbitMQProducer;
 import de.fhaachen.si.web.shop.service.CustomerService;
 import de.fhaachen.si.web.shop.service.api.IOrderService;
 
@@ -27,9 +28,13 @@ public class OrderController {
 	@Autowired
 	protected CustomerService customerService;
 	
+	@Autowired
+	protected RabbitMQProducer mqProducer;
+	
 	@PostMapping("/customer/{customerId}")
     public ResponseEntity<OrderDTO> createOrder(@PathVariable Long customerId, @RequestBody OrderDTO orderDTO) {
         OrderDTO order = orderService.createOrderFromDTO(orderDTO);
+        mqProducer.sendOrder(orderDTO);
         return ResponseEntity.ok(order);
     }
 

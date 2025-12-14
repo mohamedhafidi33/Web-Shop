@@ -1,26 +1,62 @@
 package de.fhaachen.si.web.shop.rabbitmq.producer;
 
-import org.springframework.amqp.core.AmqpTemplate;
+import java.time.LocalDate;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.fhaachen.si.web.shop.grpc.dto.OrderDTO;
-import de.fhaachen.si.web.shop.rabbitmq.config.RabbitMQConfig;
+import de.fhaachen.si.web.shop.dto.OrderDTO;
 
 @Service
 public class RabbitMQProducer {
-	private final AmqpTemplate amqpTemplate;
-	
-    @Autowired
-    public RabbitMQProducer(AmqpTemplate amqpTemplate) {
-        this.amqpTemplate = amqpTemplate;
-    }
-    
-    public void sendOrder(OrderDTO message) {
-        amqpTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE,
-                "order.request",
-                message
+	@Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public void sendOrder(OrderDTO order) {
+    	System.out.println("Sending message");
+    	de.fhaachen.si.web.shop.rabbitmq.dto.OrderDTO erpOrder = prepareOrder(order);
+        rabbitTemplate.convertAndSend(
+                "orders.request",
+                erpOrder
         );
     }
+    
+    
+    
+    private de.fhaachen.si.web.shop.rabbitmq.dto.OrderItemDTO prepareOrderItem(
+            de.fhaachen.si.web.shop.dto.OrderItemDTO orderItem) {
+
+        de.fhaachen.si.web.shop.rabbitmq.dto.OrderItemDTO dto =
+                new de.fhaachen.si.web.shop.rabbitmq.dto.OrderItemDTO();
+
+        dto.setItemID("10");
+        dto.setProduct(orderItem.getProductId());
+        dto.setQuantity(orderItem.getQuantity());
+        dto.setItemAmount(orderItem.getPrice());
+        dto.setCurrency("EUR");
+
+        return dto;
+    }
+    private de.fhaachen.si.web.shop.rabbitmq.dto.OrderDTO prepareOrder(
+            OrderDTO order) {
+
+        de.fhaachen.si.web.shop.rabbitmq.dto.OrderDTO dto =
+                new de.fhaachen.si.web.shop.rabbitmq.dto.OrderDTO();
+
+        dto.setCurrency("EUR");
+        dto.setOrderDate(LocalDate.now().toString());
+        dto.setCustomer(order.getCustomerUUID());
+        dto.setOrderAmount(order.getTotalAmount());
+
+        dto.setItems(
+                order.getItems().stream()
+                        .map(this::prepareOrderItem)
+                        .toList()
+        );
+
+        return dto;
+    }
+
+
 }
