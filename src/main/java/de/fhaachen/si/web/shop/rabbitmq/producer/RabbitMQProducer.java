@@ -31,7 +31,7 @@ public class RabbitMQProducer {
                 new de.fhaachen.si.web.shop.rabbitmq.dto.OrderItemDTO();
 
         dto.setItemID("10");
-        dto.setProduct(orderItem.getProductId());
+        dto.setProduct(orderItem.getProductUuid());
         dto.setQuantity(orderItem.getQuantity());
         dto.setItemAmount(orderItem.getPrice());
         dto.setCurrency("EUR");

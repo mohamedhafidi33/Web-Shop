@@ -3,7 +3,6 @@ package de.fhaachen.si.web.shop.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import de.fhaachen.si.web.shop.dto.OrderDTO;
@@ -20,7 +19,6 @@ import de.fhaachen.si.web.shop.service.api.IOrderService;
 import jakarta.transaction.Transactional;
 
 @Service
-@Profile("local")
 public class OrderService implements IOrderService{
 	
 	@Autowired

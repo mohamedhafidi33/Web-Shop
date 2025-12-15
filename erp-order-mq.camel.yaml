@@ -10,48 +10,74 @@
         exchangeName: default
       steps:
         - convertBodyTo:
+            id: convertBodyToda96
             type: String
         - log:
             id: log248e
-            message: '"Received order request: ${body}"'
+            message: "\"Received raw payload: ${body}\""
+        - unmarshal:
+            id: unmarshalMap
+            json:
+              id: json5aba
+              library: Jackson
+              unmarshalType: java.util.Map
         - setBody:
-            id: wrapInOrder
+            id: transformToErpFormat
             expression:
-              simple: '{"order": ${body}}'
+              groovy:
+                id: groovy952d
+                expression: |
+                  [
+                    customer_ID: body.customer,
+                    orderDate: body.orderDate,
+                    orderAmount: body.orderAmount,
+                    currency_code: body.currency ?: 'EUR',
+                    items: body.items.collect { item -> 
+                      [
+                        product_ID: item.product,
+                        quantity: item.quantity,
+                        itemAmount: item.itemAmount,
+                        currency_code: item.currency ?: 'EUR'
+                      ] 
+                    }
+                  ]
+        - marshal:
+            id: marshalErpJson
+            json:
+              id: json40c3
+              library: Jackson
         - log:
             id: logWrapped
-            message: '"Payload wrapped for ERP: ${body}"'
-        - setHeader:
-            id: setHeader8e8b
-            name: correlationId
-            expression:
-              simple:
-                id: simple1bf6
-                expression: ${header.CamelMessageId}
+            message: "\"Transformed Payload for ERP: ${body}\""
         - setHeader:
             id: setHeaderec56
             name: Content-Type
             expression:
               simple:
-                id: simplecadf
+                id: simple50e1
                 expression: application/json
+        - setHeader:
+            id: setHeader8d49
+            name: Authorization
+            expression:
+              simple:
+                id: simplebb6c
+                expression: Basic YWxpY2U6YWxpY2U=
         - to:
             id: tob331
             uri: http
             parameters:
+              httpUri: http://host.docker.internal:4004/odata/v4/simple-erp/Orders
               httpMethod: POST
-              httpUri: http://host.docker.internal:4004/rest/api/createOrder
               authMethod: Basic
-              authUsername: "{{env:ERP_USER}}"
               authPassword: "{{env:ERP_PASSWORD}}"
+              authUsername: "{{env:ERP_USER}}"
+        - convertBodyTo:
+            id: convertBodyTo93c7
+            type: String
         - log:
             id: log5688
-            message: '"ERP Response: ${body}"'
-        - marshal:
-            id: marshal0d9a
-            json:
-              id: json8d8f
-              library: Jackson
+            message: "\"ERP Response: ${body}\""
         - to:
             id: tod886
             uri: kamelet:spring-rabbitmq-sink
@@ -62,4 +88,4 @@
               exchangeName: default
         - log:
             id: log7907
-            message: '"Sent ERP response to orders.response queue"'
+            message: "\"Sent ERP response to orders.response queue\""

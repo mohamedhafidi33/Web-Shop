@@ -15,15 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.fhaachen.si.web.shop.dto.OrderDTO;
 import de.fhaachen.si.web.shop.entity.OrderStatus;
+import de.fhaachen.si.web.shop.mapper.OrderMapper;
 import de.fhaachen.si.web.shop.rabbitmq.producer.RabbitMQProducer;
 import de.fhaachen.si.web.shop.service.CustomerService;
-import de.fhaachen.si.web.shop.service.api.IOrderService;
+import de.fhaachen.si.web.shop.service.impl.OrderService;
 
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
 	@Autowired
-	protected IOrderService orderService;
+	protected OrderService orderService;
 	
 	@Autowired
 	protected CustomerService customerService;
@@ -33,9 +34,8 @@ public class OrderController {
 	
 	@PostMapping("/customer/{customerId}")
     public ResponseEntity<OrderDTO> createOrder(@PathVariable Long customerId, @RequestBody OrderDTO orderDTO) {
-        OrderDTO order = orderService.createOrderFromDTO(orderDTO);
         mqProducer.sendOrder(orderDTO);
-        return ResponseEntity.ok(order);
+        return ResponseEntity.ok(orderDTO);
     }
 
     @GetMapping("/customer/{customerId}")
