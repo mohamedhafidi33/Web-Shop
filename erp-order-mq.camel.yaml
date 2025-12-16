@@ -5,7 +5,7 @@
       deadLetterChannel:
         id: deadLetterChannel-6d64
         deadLetterUri: >-
-          kamelet:spring-rabbitmq-sink?host=rabbitmq&port=5672&queue=orders.error&exchangeName=orders.exchange&routingKey=order.error.
+          kamelet:spring-rabbitmq-sink?host=rabbitmq&port=5672&queue=orders.error&exchangeName=orders.exchange&routingKey=order.error
         redeliveryPolicy:
           id: redeliveryPolicy-df91
           maximumRedeliveries: 2
