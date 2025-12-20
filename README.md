@@ -18,7 +18,7 @@ This project was developed incrementally to demonstrate different enterprise int
       <li>Direct synchronous REST communication</li>
       <li>No external system integration</li>
     </ul>
-  </li>
+  </li><br><br>
 
   <li>
     <strong>Version 2 – Transferring Product Information Using Files</strong><br><br>
