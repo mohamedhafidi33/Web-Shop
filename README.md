@@ -32,7 +32,7 @@ This project was developed incrementally to demonstrate different enterprise int
       <li>Local database updated from file contents</li>
       <li>One-way, batch-oriented data synchronization</li>
     </ul>
-  </li>
+  </li><br><br>
 
   <li>
     <strong>Version 3 – Synchronizing Product Stock and Purchase Orders</strong><br><br>
@@ -47,7 +47,7 @@ This project was developed incrementally to demonstrate different enterprise int
       <li>Stock availability validated against ERP before checkout</li>
       <li>Dual product identifier handling (local ID and ERP product identifiers)</li>
     </ul>
-  </li>
+  </li><br><br>
 
   <li>
     <strong>Version 4 – Exchanging Data Using Messages</strong><br><br>
