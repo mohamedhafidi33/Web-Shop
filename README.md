@@ -7,10 +7,8 @@ This project was developed incrementally to demonstrate different enterprise int
 <ol>
   <li>
     <strong>Version 1 – Simple Web Shop</strong><br><br>
-
     <strong>Goal:</strong><br>
     Implement a basic web shop with a clean separation between frontend and backend.<br><br>
-
     <strong>Key characteristics:</strong>
     <ul>
       <li>React frontend for product browsing and ordering</li>
@@ -24,10 +22,8 @@ This project was developed incrementally to demonstrate different enterprise int
 
   <li>
     <strong>Version 2 – Transferring Product Information Using Files</strong><br><br>
-
     <strong>Goal:</strong><br>
     Integrate product data from an external ERP system using file-based exchange.<br><br>
-
     <strong>Key characteristics:</strong>
     <ul>
       <li>Product data imported from ERP-generated files (e.g. JSON)</li>
@@ -40,10 +36,8 @@ This project was developed incrementally to demonstrate different enterprise int
 
   <li>
     <strong>Version 3 – Synchronizing Product Stock and Purchase Orders</strong><br><br>
-
     <strong>Goal:</strong><br>
     Enable real-time synchronization between the web shop and the ERP system.<br><br>
-
     <strong>Key characteristics:</strong>
     <ul>
       <li>ERP system accessed via OData/REST APIs</li>
@@ -57,10 +51,8 @@ This project was developed incrementally to demonstrate different enterprise int
 
   <li>
     <strong>Version 4 – Exchanging Data Using Messages</strong><br><br>
-
     <strong>Goal:</strong><br>
     Decouple the web shop from the ERP system using asynchronous messaging.<br><br>
-
     <strong>Key characteristics:</strong>
     <ul>
       <li>RabbitMQ used as messaging middleware</li>
